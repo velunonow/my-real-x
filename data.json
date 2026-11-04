@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "settings": {
+    "dailyMinutes": 15,
+    "todayCount": 5,
+    "xListUrl": "",
+    "tags": ["AI", "Business", "Learning", "Writing"],
+    "updated": "2026-11-04T00:00:00.000Z"
+  },
+  "creators": [
+    {
+      "id": "seed-cenanigel",
+      "name": "",
+      "handle": "CenaNigel",
+      "platform": "x",
+      "url": "https://x.com/CenaNigel",
+      "note": "AI trainer. I liked his article — practical AI for real work.",
+      "status": "trusted",
+      "foundVia": "",
+      "tags": ["AI", "Business"],
+      "added": "2026-11-04T00:00:00.000Z",
+      "updated": "2026-11-04T00:00:00.000Z"
+    }
+  ],
+  "items": [
+    {
+      "id": "seed-cenanigel-article",
+      "url": "https://x.com/CenaNigel/status/2117844505517039747",
+      "type": "x",
+      "handle": "CenaNigel",
+      "videoId": "",
+      "title": "Nigel's article I liked",
+      "note": "Read it again and write down one idea I can use.",
+      "tags": ["AI", "Learning"],
+      "status": "unread",
+      "added": "2026-11-04T00:00:00.000Z",
+      "updated": "2026-11-04T00:00:00.000Z"
+    }
+  ],
+  "ideas": [
+    {
+      "id": "seed-first-idea",
+      "title": "My first post: one thing I learned from @CenaNigel's article",
+      "body": "",
+      "status": "idea",
+      "sourceId": "seed-cenanigel-article",
+      "tags": ["AI", "Writing"],
+      "days": [],
+      "added": "2026-11-04T00:00:00.000Z",
+      "updated": "2026-11-04T00:00:00.000Z"
+    }
+  ]
+}

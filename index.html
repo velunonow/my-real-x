@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>My Real X</title>
+  <meta name="description" content="My own calm X: only the people and posts I chose. Learn a little, make something.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="My Real X">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">My Real <span>X</span></div>
+    <span id="timer" class="pill" title="Daily reading time left"></span>
+    <button id="sync" class="pill" title="Sync status — tap for settings"></button>
+    <button id="addBtn" class="primary">+ Add</button>
+  </header>
+  <nav id="nav">
+    <button data-view="today">Today</button>
+    <button data-view="create">Create</button>
+    <button data-view="library">Library</button>
+    <button data-view="people">People</button>
+    <button data-view="settings" aria-label="Settings">⚙︎</button>
+  </nav>
+  <main id="main"><p class="muted">Loading…</p></main>
+  <dialog id="dlg"><div id="dlgBody"></div></dialog>
+  <div id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
