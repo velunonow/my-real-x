@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taste Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Nunito:wght@400;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #fafafa; --text: #18181b; --sub: #63636b; --line: #e4e4e7; --pick: #18181b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 16px 16px 40px; }
+  .bar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .progress { flex: 1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .progress i { display: block; height: 100%; background: var(--pick); transition: width .25s ease-out; }
+  .count { font-size: 14px; color: var(--sub); font-variant-numeric: tabular-nums; }
+  .back { border: 0; background: none; color: var(--sub); padding: 6px 2px; }
+  h1 { font-size: 1.5rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.015em; }
+  .why { color: var(--sub); margin: 0 0 18px; max-width: 60ch; }
+  .opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .opts.one { grid-template-columns: 1fr; }
+  .opt { border: 2px solid transparent; background: none; padding: 0; border-radius: 18px; text-align: left; transition: transform .12s ease-out; }
+  .opt:active { transform: scale(.98); }
+  .opt[aria-pressed="true"] { border-color: var(--pick); }
+  .stage { border-radius: 16px; padding: 12px; background: var(--bg); min-height: 150px; display: grid; align-content: center; overflow: hidden; }
+  .opt .name { font-weight: 650; padding: 8px 6px 0; }
+  .opt .desc { font-size: 13.5px; color: var(--sub); padding: 0 6px 6px; }
+  .skip { margin-top: 18px; border: 0; background: none; color: var(--sub); text-decoration: underline; text-underline-offset: 3px; padding: 6px 0; }
+  .text-opt .stage { min-height: 0; padding: 16px; background: #fff; border: 1px solid var(--line); }
+  .text-opt .stage b { font-size: 1.1rem; }
+
+  /* ---------- the sample card, driven by variables ---------- */
+  .s { --bg: #f1f2f4; --card: #ffffff; --ink: #18181b; --muted: #6b6b73; --accent: #2563eb;
+       --border: none; --shadow: 0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
+       --radius: 14px; --pad: 14px; --gap: 10px; --size: 14px; --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+       --btn-bg: var(--accent); --btn-ink: #fff; --btn-border: transparent;
+       --icon: inline-block; --label: inline; --ease: cubic-bezier(.2,.8,.2,1); --dur: .16s; --press: .96; }
+  .card { background: var(--card); border: var(--border); box-shadow: var(--shadow); border-radius: var(--radius); padding: var(--pad);
+          color: var(--ink); font-family: var(--font); font-size: var(--size); line-height: 1.4; transition: transform var(--dur) var(--ease); }
+  .card + .card { margin-top: var(--gap); }
+  .who { display: flex; gap: 8px; align-items: center; }
+  .av { width: 26px; height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, #fff); color: var(--accent);
+        display: grid; place-items: center; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+  .nm { font-weight: 650; font-size: .95em; }
+  .mt { color: var(--muted); font-size: .82em; }
+  .ttl { font-weight: 650; margin: 8px 0 2px; font-size: 1.05em; letter-spacing: -.005em; }
+  .nt { color: var(--muted); font-size: .9em; }
+  .acts { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .b { display: inline-flex; align-items: center; gap: 5px; border-radius: calc(var(--radius) * .6); padding: 6px 10px; font-weight: 650; font-size: .88em;
+       background: var(--btn-bg); color: var(--btn-ink); border: 1.5px solid var(--btn-border); transition: transform var(--dur) var(--ease); }
+  .b.sec { background: var(--btn2-bg, color-mix(in srgb, var(--ink) 6%, transparent)); color: var(--ink); border-color: var(--btn2-border, transparent); }
+  .b svg { display: var(--icon); width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .b span { display: var(--label); }
+  .s:active .card, .s.tapped .card { transform: scale(var(--press)); }
+  /* layouts */
+  .row { display: flex; gap: 8px; align-items: center; background: var(--card); border: var(--border); box-shadow: var(--shadow);
+         border-radius: calc(var(--radius) * .7); padding: 8px 10px; color: var(--ink); font-family: var(--font); font-size: calc(var(--size) * .92); }
+  .row + .row { margin-top: 6px; }
+  .row .ttl { margin: 0; font-size: 1em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .tile { background: var(--card); border: var(--border); box-shadow: var(--shadow); border-radius: calc(var(--radius) * .7); padding: 8px;
+          color: var(--ink); font-family: var(--font); font-size: calc(var(--size) * .85); }
+  .tile .pic { height: 34px; border-radius: calc(var(--radius) * .45); background: color-mix(in srgb, var(--accent) 16%, #fff); margin-bottom: 6px; }
+  .tile.tall .pic { height: 60px; }
+
+  /* result */
+  .result .stage { min-height: 0; padding: 18px; }
+  .summary { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 16px 0; white-space: pre-wrap;
+             font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .primary { background: var(--pick); color: #fff; border: 0; border-radius: 12px; padding: 12px 18px; font-weight: 650; }
+  .ghost { background: none; border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; margin-left: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const ICONS = {
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+};
+const icon = (n) => `<svg viewBox="0 0 24 24">${ICONS[n]}</svg>`;
+const F = {
+  system: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  nunito: '"Nunito", system-ui, sans-serif',
+  serif: '"Newsreader", Georgia, serif',
+  grotesk: '"Space Grotesk", system-ui, sans-serif',
+};
+
+const Q = [
+  { id: 'background', title: 'Which background feels right?', why: 'The colour behind everything. It sets the overall mood more than anything else.',
+    options: [
+      { id: 'white', name: 'Pure white', desc: 'Bright and clean', v: { '--bg': '#ffffff' } },
+      { id: 'cool-gray', name: 'Cool light gray', desc: 'Neutral, calm, a bit techy', v: { '--bg': '#f1f2f4' } },
+      { id: 'warm-white', name: 'Warm off-white', desc: 'Soft, cosy, like good paper', v: { '--bg': '#f6f4f0' } },
+      { id: 'soft-tint', name: 'Soft colour tint', desc: 'A hint of colour everywhere', v: { '--bg': '#edf2fa' } },
+    ] },
+  { id: 'card-edges', title: 'How should a card stand out?', why: 'Cards are your main building block. This is how each one separates from the background.',
+    options: [
+      { id: 'flat', name: 'Flat tone', desc: 'No line, no shadow — just a slightly different colour', v: { '--card': 'color-mix(in srgb, var(--bg), #18181b 5%)', '--shadow': 'none', '--border': 'none' } },
+      { id: 'thin-line', name: 'Thin line', desc: 'Neat and precise', v: { '--card': '#fff', '--shadow': 'none', '--border': '1px solid rgba(0,0,0,.1)' } },
+      { id: 'soft-shadow', name: 'Soft shadow', desc: 'Cards gently float', v: { '--card': '#fff', '--shadow': '0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.07)', '--border': 'none' } },
+      { id: 'bold-outline', name: 'Bold outline', desc: 'Playful, like stickers', v: { '--card': '#fff', '--shadow': '3px 3px 0 #18181b', '--border': '2px solid #18181b' } },
+    ] },
+  { id: 'corners', title: 'How round should the corners be?', why: 'Sharper feels serious and precise. Rounder feels soft and friendly.',
+    options: [
+      { id: 'sharp', name: 'Sharp', desc: 'Serious, editorial', v: { '--radius': '3px' } },
+      { id: 'gentle', name: 'Gentle', desc: 'Balanced, like most apps', v: { '--radius': '10px' } },
+      { id: 'round', name: 'Round', desc: 'Soft and friendly', v: { '--radius': '20px' } },
+      { id: 'very-round', name: 'Very round', desc: 'Bubbly, playful', v: { '--radius': '28px' } },
+    ] },
+  { id: 'spacing', title: 'Tight or airy?', why: 'How much empty space sits inside and between cards. Tight shows more at once; airy feels calmer.',
+    options: [
+      { id: 'compact', name: 'Compact', desc: 'More on screen', v: { '--pad': '10px', '--gap': '6px', '--size': '13px' } },
+      { id: 'balanced', name: 'Balanced', desc: 'In between', v: { '--pad': '14px', '--gap': '10px', '--size': '14px' } },
+      { id: 'airy', name: 'Airy', desc: 'Calm, room to breathe', v: { '--pad': '20px', '--gap': '16px', '--size': '15px' } },
+    ] },
+  { id: 'font', title: 'Which letters feel like you?', why: 'The typeface is the voice of the app. Same words, different personality.',
+    options: [
+      { id: 'clean', name: 'Clean & neutral', desc: 'Like your iPhone', v: { '--font': F.system } },
+      { id: 'friendly', name: 'Soft & friendly', desc: 'Rounded letters', v: { '--font': F.nunito } },
+      { id: 'bookish', name: 'Bookish & thoughtful', desc: 'A reading serif', v: { '--font': F.serif } },
+      { id: 'quirky', name: 'Quirky & modern', desc: 'A bit techy, a bit odd', v: { '--font': F.grotesk } },
+    ] },
+  { id: 'accent', title: 'Pick your accent colour', why: 'Used only for the important things: the main button, links, what’s selected. Everything else stays quiet.',
+    options: [
+      { id: 'blue', name: 'Blue', desc: 'Trustworthy, familiar', v: { '--accent': '#2563eb' } },
+      { id: 'green', name: 'Deep green', desc: 'Calm, natural', v: { '--accent': '#1f7a55' } },
+      { id: 'orange', name: 'Orange', desc: 'Energetic, warm', v: { '--accent': '#e2550b' } },
+      { id: 'purple', name: 'Violet', desc: 'Creative', v: { '--accent': '#7c3aed' } },
+      { id: 'pink', name: 'Raspberry', desc: 'Bold, personal', v: { '--accent': '#d61f69' } },
+      { id: 'black', name: 'Black', desc: 'No colour — pure ink', v: { '--accent': '#18181b' } },
+    ] },
+  { id: 'buttons', title: 'What should buttons look like?', why: 'Buttons are what you tap most. Strong buttons are obvious; softer ones are calmer.',
+    options: [
+      { id: 'solid', name: 'Solid', desc: 'Filled with colour — very clear', v: { '--btn-bg': 'var(--accent)', '--btn-ink': '#fff', '--btn-border': 'transparent' } },
+      { id: 'soft', name: 'Soft tint', desc: 'Light colour, gentle', v: { '--btn-bg': 'color-mix(in srgb, var(--accent) 13%, #fff)', '--btn-ink': 'var(--accent)', '--btn-border': 'transparent' } },
+      { id: 'outline', name: 'Outline', desc: 'Just a coloured border', v: { '--btn-bg': 'transparent', '--btn-ink': 'var(--accent)', '--btn-border': 'var(--accent)', '--btn2-bg': 'transparent', '--btn2-border': 'rgba(0,0,0,.18)' } },
+      { id: 'text', name: 'Text only', desc: 'Minimal, like links', v: { '--btn-bg': 'transparent', '--btn-ink': 'var(--accent)', '--btn-border': 'transparent', '--btn2-bg': 'transparent' } },
+    ] },
+  { id: 'icons', title: 'Icons on buttons?', why: 'Icons are quick to spot but you have to learn them. Words are slower but never confusing.',
+    options: [
+      { id: 'words', name: 'Words only', desc: 'Nothing to learn', v: { '--icon': 'none', '--label': 'inline' } },
+      { id: 'icon-and-word', name: 'Icon + word', desc: 'Best of both', v: { '--icon': 'inline-block', '--label': 'inline' } },
+      { id: 'icons-only', name: 'Icons only', desc: 'Cleanest, once learned', v: { '--icon': 'inline-block', '--label': 'none' } },
+    ] },
+  { id: 'list-style', title: 'How should a list of saved things look?', why: 'For your Library and collections: see many at once, or one at a time?', layout: true,
+    options: [
+      { id: 'rows', name: 'Compact rows', desc: 'Scan many quickly', layout: 'rows' },
+      { id: 'cards', name: 'Full cards', desc: 'One thing at a time', layout: 'cards' },
+      { id: 'tiles', name: 'Tile grid', desc: 'Like a mood board', layout: 'tiles' },
+    ] },
+  { id: 'motion', title: 'How should it feel when you tap?', why: 'Tap each preview. Motion is the “feel” of an app — instant, smooth, or springy.', motion: true,
+    options: [
+      { id: 'still', name: 'Still', desc: 'Nothing moves', v: { '--dur': '0s', '--press': '1' } },
+      { id: 'subtle', name: 'Subtle', desc: 'A quick, smooth press', v: { '--dur': '.16s', '--press': '.97', '--ease': 'cubic-bezier(.2,.8,.2,1)' } },
+      { id: 'springy', name: 'Springy', desc: 'Bouncy and alive', v: { '--dur': '.45s', '--press': '.93', '--ease': 'cubic-bezier(.34,1.8,.5,1)' } },
+    ] },
+  { id: 'feeling', title: 'One word for how it should feel?', why: 'This guides all the small decisions I make later.', text: true,
+    options: [
+      { id: 'calm', name: 'Calm', desc: 'Quiet, slow, no pressure' },
+      { id: 'focused', name: 'Focused', desc: 'Sharp, efficient, no distractions' },
+      { id: 'friendly', name: 'Friendly', desc: 'Warm, encouraging, human' },
+      { id: 'playful', name: 'Playful', desc: 'Fun, surprising, a bit cheeky' },
+    ] },
+];
+
+let answers = {};
+try { answers = JSON.parse(localStorage.getItem('taste.answers')) || {}; } catch (e) { answers = {}; }
+let step = 0;
+const save = () => { try { localStorage.setItem('taste.answers', JSON.stringify(answers)); } catch (e) { /* ignore */ } };
+
+function varsUpTo(n, extra) {
+  const v = {};
+  Q.slice(0, n).forEach((q) => { const o = q.options.find((x) => x.id === answers[q.id]); if (o && o.v) Object.assign(v, o.v); });
+  if (extra) Object.assign(v, extra);
+  return Object.entries(v).map(([k, val]) => `${k}:${val}`).join(';').replace(/"/g, '&quot;');
+}
+const cardHtml = () => `<div class="card">
+  <div class="who"><div class="av">N</div><div><div class="nm">Nigel</div><div class="mt">@CenaNigel · X post</div></div></div>
+  <div class="ttl">Nigel’s article I liked</div>
+  <div class="nt">Write down one idea I can use.</div>
+  <div class="acts"><span class="b">${icon('check')}<span>Done</span></span><span class="b sec">${icon('pen')}<span>Make from this</span></span></div>
+</div>`;
+function layoutHtml(kind) {
+  if (kind === 'rows') {
+    return ['Nigel’s article I liked', 'DESIGN.md format', 'Apple Design guidelines', '10 repos for UI design']
+      .map((t, i) => `<div class="row"><div class="av">${'NDAR'[i]}</div><div class="ttl">${t}</div></div>`).join('');
+  }
+  if (kind === 'tiles') {
+    return `<div class="tiles">${['Nigel’s article', 'DESIGN.md', 'Apple Design', '10 UI repos']
+      .map((t, i) => `<div class="tile ${i % 3 === 0 ? 'tall' : ''}"><div class="pic"></div>${t}</div>`).join('')}</div>`;
+  }
+  return cardHtml();
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (step >= Q.length) return renderResult(app);
+  const q = Q[step];
+  const opts = q.options.map((o) => {
+    const pressed = answers[q.id] === o.id;
+    if (q.text) {
+      return `<button class="opt text-opt" data-o="${o.id}" aria-pressed="${pressed}"><div class="stage"><b>${o.name}</b><div class="desc" style="padding:2px 0 0">${o.desc}</div></div></button>`;
+    }
+    const inner = q.layout ? layoutHtml(o.layout) : cardHtml();
+    return `<button class="opt" data-o="${o.id}" aria-pressed="${pressed}">
+      <div class="stage s" style="${varsUpTo(step, o.v)}">${inner}</div>
+      <div class="name">${o.name}</div><div class="desc">${o.desc}</div></button>`;
+  }).join('');
+  app.innerHTML = `<div class="bar">
+      <button class="back" ${step ? '' : 'disabled style="visibility:hidden"'} data-back>← Back</button>
+      <div class="progress"><i style="width:${(step / Q.length) * 100}%"></i></div>
+      <span class="count">${step + 1} / ${Q.length}</span></div>
+    <h1>${q.title}</h1><p class="why">${q.why}</p>
+    <div class="opts ${q.layout || q.text ? 'one' : ''}">${opts}</div>
+    <button class="skip" data-skip>Not sure — skip</button>`;
+}
+
+function renderResult(app) {
+  const lines = Q.map((q) => {
+    const o = q.options.find((x) => x.id === answers[q.id]);
+    return `${q.id}: ${o ? o.id : 'not sure'}`;
+  }).join('\n');
+  const lay = (Q.find((q) => q.id === 'list-style').options.find((o) => o.id === answers['list-style']) || {}).layout || 'cards';
+  app.innerHTML = `<div class="bar"><button class="back" data-back>← Back</button><div class="progress"><i style="width:100%"></i></div><span class="count">Done</span></div>
+    <h1>This is your taste</h1>
+    <p class="why">Every choice combined into one card. Copy the text below and paste it to Claude.</p>
+    <div class="result"><div class="stage s" style="${varsUpTo(Q.length)}">${cardHtml()}${lay !== 'cards' ? `<div style="height:12px"></div>${layoutHtml(lay)}` : ''}</div></div>
+    <div class="summary" id="sum">My taste (light mode):\n${lines}</div>
+    <button class="primary" data-copy>Copy my answers</button><button class="ghost" data-restart>Start over</button>`;
+}
+
+document.addEventListener('click', (e) => {
+  const o = e.target.closest('[data-o]');
+  if (o) {
+    const q = Q[step];
+    answers[q.id] = o.dataset.o; save();
+    if (q.motion) {
+      const st = o.querySelector('.stage');
+      st.classList.add('tapped'); setTimeout(() => st.classList.remove('tapped'), 220);
+      document.querySelectorAll('[data-o]').forEach((b) => b.setAttribute('aria-pressed', String(b === o)));
+      if (!document.querySelector('[data-next]')) {
+        document.querySelector('.skip').insertAdjacentHTML('beforebegin', '<div style="margin-top:16px"><button class="primary" data-next>Next →</button></div>');
+      }
+      return;
+    }
+    setTimeout(() => { step++; render(); window.scrollTo(0, 0); }, 160);
+    document.querySelectorAll('[data-o]').forEach((b) => b.setAttribute('aria-pressed', String(b === o)));
+    return;
+  }
+  if (e.target.closest('[data-next]')) { step++; render(); window.scrollTo(0, 0); }
+  if (e.target.closest('[data-skip]')) { delete answers[Q[step].id]; save(); step++; render(); window.scrollTo(0, 0); }
+  if (e.target.closest('[data-back]')) { step = Math.max(0, step - 1); render(); }
+  if (e.target.closest('[data-restart]')) { answers = {}; save(); step = 0; render(); }
+  if (e.target.closest('[data-copy]')) {
+    const t = document.getElementById('sum').textContent;
+    const done = () => { e.target.textContent = 'Copied ✓'; };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, () => { selectSum(); });
+    else selectSum();
+  }
+});
+function selectSum() { const r = document.createRange(); r.selectNodeContents(document.getElementById('sum')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+render();
+</script>
+</body>
+</html>
