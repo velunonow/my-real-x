@@ -371,9 +371,14 @@ const canEmbed = (it) => it.type === 'x' || it.type === 'youtube';
 
 /* ---------- small renderers ---------- */
 const tagsHtml = (tags) => (tags && tags.length ? `<div class="tags">${tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : '');
+function allTags() {
+  const set = new Set(db.settings.tags);
+  live('items').concat(live('creators'), live('ideas')).forEach((x) => (x.tags || []).forEach((t) => set.add(t)));
+  return [...set];
+}
 function tagPicker(selected) {
   return `<fieldset class="tagpick"><legend>Tags</legend>
-    ${db.settings.tags.map((t) => `<label class="chip"><input type="checkbox" name="tag" value="${esc(t)}" ${selected.includes(t) ? 'checked' : ''}>${esc(t)}</label>`).join('')}
+    ${allTags().map((t) => `<label class="chip"><input type="checkbox" name="tag" value="${esc(t)}" ${selected.includes(t) ? 'checked' : ''}>${esc(t)}</label>`).join('')}
     <input name="newTags" placeholder="New tags, comma separated" autocomplete="off"></fieldset>`;
 }
 function lockedHtml() {
@@ -398,10 +403,11 @@ function itemCard(it, embed = false) {
     ${open && canEmbed(it) ? `<div class="embed">${embedHtml(it)}</div>` : ''}
     <div class="actions">
       ${!embed && canEmbed(it) ? `<button data-act="toggle">${open ? 'Hide' : 'Show'}</button>` : ''}
-      ${it.status !== 'read' ? '<button class="primary" data-act="done">✓ Done</button>' : ''}
+      ${it.status === 'unread' || it.status === 'archived' ? '<button class="primary" data-act="done">✓ Done</button>' : ''}
       <button data-act="make-idea">✍️ Make from this</button>
       <button data-act="edit">Edit</button>
-      ${it.status === 'unread' ? '<button data-act="archive" title="Not worth my time">Drop</button>' : '<button data-act="unread">Mark unread</button>'}
+      ${it.status === 'unread' ? '<button data-act="keep" title="Not for daily reading — keep for when I need it">Keep as reference</button><button data-act="archive" title="Not worth my time">Drop</button>'
+        : it.status === 'reference' ? '<button data-act="unread">Move to reading</button>' : '<button data-act="unread">Mark unread</button>'}
     </div>
     <div class="slot"></div>
   </article>`;
@@ -499,13 +505,13 @@ function renderCreate() {
 function renderLibrary() {
   if (locked()) return lockedHtml();
   const f = filters.lib;
-  const tags = db.settings.tags;
+  const tags = allTags();
   return `<section class="card">
       <div class="row">
         <input type="search" data-filter="lib.q" placeholder="Search titles, notes, @handles…" value="${esc(f.q)}">
       </div>
       <div class="row">
-        <select data-filter="lib.status">${opts([['unread', 'Unread'], ['read', 'Read'], ['archived', 'Dropped'], ['', 'All']], f.status)}</select>
+        <select data-filter="lib.status">${opts([['unread', 'Unread'], ['reference', 'Reference'], ['read', 'Read'], ['archived', 'Dropped'], ['', 'All']], f.status)}</select>
         <select data-filter="lib.type">${opts([['', 'All types'], ['x', '𝕏 posts'], ['youtube', 'YouTube'], ['web', 'Articles / web']], f.type)}</select>
         <select data-filter="lib.tag">${opts([['', 'All tags'], ...tags.map((t) => [t, t]), ['__none', 'No tag yet']], f.tag)}</select>
       </div>
@@ -561,7 +567,7 @@ function renderPeople() {
       ${trialDue ? `<p class="warn">${trialDue} person(s) finished their ${TRIAL_DAYS}-day trial — keep or drop?</p>` : ''}
       <div class="row">
         <select data-filter="people.status">${opts([['trusted', 'Trusted'], ['trial', 'On trial'], ['', 'Everyone']], f.status)}</select>
-        <select data-filter="people.tag">${opts([['', 'All tags'], ...s.tags.map((t) => [t, t])], f.tag)}</select>
+        <select data-filter="people.tag">${opts([['', 'All tags'], ...allTags().map((t) => [t, t])], f.tag)}</select>
         <button data-act="open-add" data-kind="creator">+ Add person</button>
       </div>
     </section>
@@ -897,6 +903,7 @@ function onClick(e) {
       break;
     }
     case 'make-idea': newIdeaFromItem(rec); break;
+    case 'keep': rec.status = 'reference'; upsert('items', rec); refreshCard(kind, id); toast('Kept as reference — out of your daily queue'); break;
     case 'archive': rec.status = 'archived'; upsert('items', rec); refreshCard(kind, id); toast('Dropped — less noise'); break;
     case 'unread': rec.status = 'unread'; delete rec.readAt; upsert('items', rec); refreshCard(kind, id); break;
     case 'edit': openEdit(kind, id); break;

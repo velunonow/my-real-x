@@ -4,8 +4,14 @@
     "dailyMinutes": 15,
     "todayCount": 5,
     "xListUrl": "",
-    "tags": ["AI", "Business", "Learning", "Writing"],
-    "updated": "2026-11-04T00:00:00.000Z"
+    "tags": [
+      "AI",
+      "Business",
+      "Learning",
+      "Writing",
+      "Design"
+    ],
+    "updated": "2026-11-04T15:00:00.000Z"
   },
   "creators": [
     {
@@ -17,7 +23,10 @@
       "note": "AI trainer. I liked his article — practical AI for real work.",
       "status": "trusted",
       "foundVia": "",
-      "tags": ["AI", "Business"],
+      "tags": [
+        "AI",
+        "Business"
+      ],
       "added": "2026-11-04T00:00:00.000Z",
       "updated": "2026-11-04T00:00:00.000Z"
     }
@@ -31,10 +40,163 @@
       "videoId": "",
       "title": "Nigel's article I liked",
       "note": "Read it again and write down one idea I can use.",
-      "tags": ["AI", "Learning"],
+      "tags": [
+        "AI",
+        "Learning"
+      ],
       "status": "unread",
       "added": "2026-11-04T00:00:00.000Z",
       "updated": "2026-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "design-1",
+      "url": "https://github.com/garrytan/gstack",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "gstack — Garry Tan's skill pack (design roles)",
+      "note": "Design roles: plan-design-review (7-pass review) and design-shotgun. Best idea: 'Don't make me think' and 'omit, then omit again'.",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-2",
+      "url": "https://github.com/Nutlope/hallmark",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "Hallmark — design skill that refuses to look AI-made",
+      "note": "50 themes treated as 'materials'. Gates in tiers: Floor (never ship), Reflex (AI defaults), Finish (craft details).",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-3",
+      "url": "https://github.com/google-labs-code/design.md",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "DESIGN.md — Google Labs format for design systems",
+      "note": "One file = YAML tokens (colors, type, spacing) + prose explaining why. Portable across projects. Has lint + diff CLI.",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-4",
+      "url": "https://github.com/Leonxlnx/taste-skill",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "Taste skill — registry of 'AI tells'",
+      "note": "Dated list of things that make a UI look generated (purple gradients, emoji icons, eyebrow labels, same radius everywhere…).",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-5",
+      "url": "https://github.com/elayadesign/ai-design-skills",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "AI Design Skills — landing page + Figma skills",
+      "note": "Landing-page and Figma-designer skills; SlopScan audits a live page against the same rules.",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-6",
+      "url": "https://github.com/pbakaus/impeccable",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "Impeccable — design director skill",
+      "note": "Splits PRODUCT.md (who/why) from DESIGN.md (look). Modes: Persuade, Operate, Read, Experience. 'Craft floor' checklist.",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-7",
+      "url": "https://github.com/benjitaylor/skills/tree/main/stageshow",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "Stageshow — faux product UI for demos",
+      "note": "'Reads as a real product, simplified to what the viewer needs, framed with intent.' For marketing shots and demos.",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-8",
+      "url": "https://developer.apple.com/design/",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "Apple Design (Human Interface Guidelines)",
+      "note": "The reference for clarity, feel, motion and platform conventions.",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-9",
+      "url": "https://github.com/emilkowalski/skills",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "Emil Kowalski — design engineering skills",
+      "note": "Animation decision framework, Apple-style feel, UI cheatsheet (tabular numbers, 65ch lines, scale(0.97) on press).",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
+    },
+    {
+      "id": "design-10",
+      "url": "https://x.com/RoundtableSpace/status/2110255627704455591",
+      "type": "x",
+      "handle": "RoundtableSpace",
+      "videoId": "",
+      "title": "10 GitHub repos that turn Claude Code & Codex into elite UI designers",
+      "note": "The list that started my Design collection.",
+      "tags": [
+        "Design"
+      ],
+      "status": "reference",
+      "added": "2026-11-04T15:00:00.000Z",
+      "updated": "2026-11-04T15:00:00.000Z"
     }
   ],
   "ideas": [
@@ -44,7 +206,10 @@
       "body": "",
       "status": "idea",
       "sourceId": "seed-cenanigel-article",
-      "tags": ["AI", "Writing"],
+      "tags": [
+        "AI",
+        "Writing"
+      ],
       "days": [],
       "added": "2026-11-04T00:00:00.000Z",
       "updated": "2026-11-04T00:00:00.000Z"

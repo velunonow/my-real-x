@@ -116,6 +116,7 @@ label.check input, .chip input, .seg input { width: auto; margin: 0 6px 0 0; }
 .badge { font-size: .75rem; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
 .s-unread, .s-draft, .s-trial { color: var(--warn); border-color: var(--warn); }
 .s-read, .s-published, .s-trusted { color: var(--ok); border-color: var(--ok); }
+.s-reference { color: var(--accent); border-color: var(--accent); }
 
 .tagpick { border: 1px solid var(--line); border-radius: 9px; padding: 6px 10px; margin: 10px 0; }
 .tagpick legend { font-size: .9rem; font-weight: 600; }
