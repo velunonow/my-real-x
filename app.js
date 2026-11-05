@@ -489,7 +489,7 @@ function renderLibrary() {
       <p class="sub">${plural(items.length, 'thing')} you chose to keep.</p>
     </section>
     <div class="search">${icon('search')}<input type="search" data-filter="lib.q" placeholder="Search your collection" value="${esc(f.q)}" enterkeyhint="search"></div>
-    <div class="chips">${chipsHtml([['', 'Everything', items.length], ['unread', 'To read', count('unread')], ['reference', 'Reference', count('reference')], ['read', 'Read', count('read')], ['archived', 'Dropped', count('archived')]], f.status,
+    <div class="chips">${chipsHtml([['', 'Everything', items.length], ['unread', 'To read', count('unread')], ['reference', 'Reference', count('reference')], ['read', 'Read', count('read')], ...(count('archived') ? [['archived', 'Dropped', count('archived')]] : [])], f.status,
       (v) => `data-act="filter" data-group="lib" data-key="status" data-val="${esc(v)}"`)}</div>
     <div class="chips">${chipsHtml([['', 'All tags'], ...allTags().map((t) => [t, t]), ['__none', 'No tag yet']], f.tag,
       (v) => `data-act="filter" data-group="lib" data-key="tag" data-val="${esc(v)}"`)}</div>
@@ -777,9 +777,6 @@ function openItem(id, { markRead = true } = {}) {
     <p class="src" style="margin-top:8px">${typeIcon(it)}<span>${esc(sourceLine(it))}</span> · <a href="${esc(safeHref(it.url))}" target="_blank" rel="noopener">Open original</a></p>
     ${it.type === 'x' && it.text && !media.includes('twitter-tweet') ? `<p class="post-text">${esc(it.text)}</p>` : ''}
     <textarea class="plain note" data-field="note" rows="2" placeholder="Why is this worth your time? (optional)">${esc(it.note || '')}</textarea>
-    ${it.takeaway || it.status === 'read' ? `<span class="field-label">My takeaway</span><textarea class="boxed serif" data-field="takeaway" rows="2" placeholder="One line you’ll use or make from this" style="font-size:18px">${esc(it.takeaway || '')}</textarea>` : ''}
-    <span class="field-label">Status</span>
-    <div class="seg">${[['unread', 'To read'], ['reference', 'Reference'], ['read', 'Read'], ['archived', 'Dropped']].map(([v, l]) => `<button type="button" data-act="set-status" data-scope="item" data-status="${v}" aria-pressed="${it.status === v}">${l}</button>`).join('')}</div>
     <span class="field-label">Tags</span>
     ${tagChips(it.tags || [], 'item')}
     <div class="actions" style="margin-top:26px">
