@@ -239,7 +239,7 @@
     {
       "id": "mw2z7idlguwt2",
       "added": "2026-11-05T03:18:34.185Z",
-      "status": "unread",
+      "status": "read",
       "url": "https://x.com/trq212/status/2052809885763747935",
       "type": "x",
       "handle": "trq212",
@@ -251,11 +251,12 @@
         "AI",
         "Learning"
       ],
-      "updated": "2026-11-05T06:53:08.510Z",
+      "updated": "2026-11-05T06:53:24.686Z",
       "text": "This is now also on the Claude Blog.\n\nMarkdown has become the dominant file format used by agents to communicate with us. It’s simple, portable, has some rich text capability and is easy for you to",
       "author": "Thariq",
       "image": "https://pbs.twimg.com/media/HHz_ftzaIAAwkQs.jpg",
-      "enriched": "2026-11-05T06:53:08.510Z"
+      "enriched": "2026-11-05T06:53:08.510Z",
+      "readAt": "2026-11-05T06:53:24.686Z"
     }
   ],
   "ideas": [
