@@ -440,7 +440,7 @@ function featureCard(it) {
     ${img ? `<div data-open>${imgTag(img)}</div>` : ''}
     <div class="pad">
       <p class="src">${typeIcon(it)}<span>${esc(sourceLine(it))}</span></p>
-      <div data-open>${text ? `<p class="post-text">${esc(clip(it.text, 500))}</p>` : `<h3 class="title">${esc(itemTitle(it))}</h3>`}</div>
+      <div data-open>${it.title || !text ? `<h3 class="title">${esc(itemTitle(it))}</h3>` : ''}${text ? `<p class="post-text">${esc(clip(it.text, 500))}</p>` : ''}</div>
       ${it.note ? `<p class="note">${esc(it.note)}</p>` : ''}
       <div class="actions">
         <button type="button" class="btn primary" data-act="done">${icon('check')}Done</button>
@@ -452,7 +452,7 @@ function featureCard(it) {
 }
 function tileCard(it) {
   const img = itemImage(it);
-  const quote = it.type === 'x' && it.text && !img;
+  const quote = it.type === 'x' && it.text && !img && !it.title;
   const flag = it.status === 'unread' ? '<span class="flag">To read</span>' : it.status === 'archived' ? '<span class="flag muted">Dropped</span>' : '';
   return `<article class="card tile ${quote ? 'quote' : ''}" data-card="${it.id}" data-kind="items" data-open>
     ${imgTag(img)}
@@ -720,6 +720,7 @@ function detect(text) {
   if (p.kind === 'creator') return { kind: 'creator', p, hint: `A person on ${p.platform === 'x' ? 'X' : 'YouTube'} — they’ll start on a ${TRIAL_DAYS}-day trial.` };
   const existing = findItemByUrl(p.url);
   if (existing) return { kind: 'item', p, existing, hint: 'Already in your collection — saving opens it.' };
+  if (/^https:\/\/x\.com\/i\/article\//.test(p.url)) return { kind: 'item', p, hint: 'An X article. Tip: save the post that shares it (x.com/name/status/…) instead — that way you get its title and cover photo.' };
   const what = p.type === 'x' ? `An X post${p.handle ? ` by @${p.handle}` : ''}` : p.type === 'youtube' ? 'A YouTube video' : `A link from ${hostOf(p.url)}`;
   return { kind: 'item', p, hint: `${what} — it goes to Today’s reading.` };
 }

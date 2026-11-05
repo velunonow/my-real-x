@@ -39,13 +39,16 @@ const fill = (rec, key, val) => { if (val && !rec[key]) { rec[key] = String(val)
 async function enrichX(it) {
   const id = statusId(it.url);
   if (!id) return false;
-  const j = await get(`${FX}/status/${id}`, true);
-  const t = j && j.tweet;
-  if (!t) return false;
+  // Documented v2 endpoint first ({ status }), older v1 endpoint as a fallback ({ tweet }).
+  const t = (await get(`${FX}/2/status/${id}`, true).catch(() => null))?.status
+    || (await get(`${FX}/status/${id}`, true).catch(() => null))?.tweet;
+  if (!t || !t.author) return false;
   let ch = false;
   const art = t.article;
   if (art && art.title) ch = fill(it, 'title', art.title) || ch;
-  ch = fill(it, 'text', t.raw_text?.text || t.text || art?.preview_text) || ch;
+  // An article post's own text is usually just a short link; its preview text reads better.
+  const body = art ? art.preview_text : (t.raw_text?.text || t.text);
+  ch = fill(it, 'text', (body || '').replace(/\s*https:\/\/t\.co\/\w+\s*$/, '')) || ch;
   ch = fill(it, 'author', t.author?.name) || ch;
   if (!it.handle && t.author?.screen_name) { it.handle = t.author.screen_name; ch = true; }
   const img = art?.cover_media?.media_info?.original_img_url || t.media?.photos?.[0]?.url || t.media?.videos?.[0]?.thumbnail_url || t.media?.mosaic?.formats?.jpeg;
@@ -73,8 +76,9 @@ async function enrichYouTube(it) {
 }
 async function enrichPerson(c) {
   if (c.platform !== 'x' || !c.handle) return false;
-  const j = await get(`${FX}/${encodeURIComponent(c.handle)}`, true);
-  const u = j && j.user;
+  const h = encodeURIComponent(c.handle);
+  const u = (await get(`${FX}/2/profile/${h}`, true).catch(() => null))?.user
+    || (await get(`${FX}/${h}`, true).catch(() => null))?.user;
   if (!u) return false;
   let ch = fill(c, 'name', u.name);
   ch = fill(c, 'avatar', (u.avatar_url || '').replace('_normal.', '_400x400.')) || ch;
