@@ -20,17 +20,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
         with:
-          node-version: 20
-      - name: Fetch previews
-        run: node .github/scripts/enrich.mjs
-      - name: Commit
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Fetch previews and commit
+        # Always work on the newest data.json: the app (or a previous run) may
+        # have saved while this run was queued. If a save lands while we work,
+        # the push is rejected; start again from the newest copy (up to 4 tries).
         run: |
-          if git diff --quiet -- data.json; then echo "No changes"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Add link previews" -- data.json
-          git pull --rebase origin "$GITHUB_REF_NAME"
-          git push origin "HEAD:$GITHUB_REF_NAME"
+          for attempt in 1 2 3 4; do
+            git fetch -q origin "$GITHUB_REF_NAME"
+            git reset -q --hard "origin/$GITHUB_REF_NAME"
+            node .github/scripts/enrich.mjs
+            if git diff --quiet -- data.json; then echo "No changes"; exit 0; fi
+            git commit -q -m "Add link previews" -- data.json
+            if git push -q origin "HEAD:$GITHUB_REF_NAME"; then echo "Saved"; exit 0; fi
+            echo "Someone saved at the same time; retrying ($attempt)"
+            sleep $((attempt * 5))
+          done
+          echo "Could not save after 4 tries"; exit 1
