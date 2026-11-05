@@ -34,15 +34,28 @@ function meta(html, names) {
 }
 const abs = (u, base) => { try { return new URL(u, base).href; } catch { return ''; } };
 const statusId = (url) => (url.match(/\/status\/(\d+)/) || [])[1];
+// Try each URL in turn; return the first JSON body that has `key`. Throws with every
+// failure reason if none worked, so the run log says why and the link is retried later.
+async function firstJson(urls, key) {
+  const why = [];
+  for (const u of urls) {
+    try {
+      const j = await get(u, true);
+      if (j && j[key]) return j[key];
+      why.push(`${u}: no ${key} (code ${j && j.code})`);
+    } catch (e) { why.push(`${u}: ${e.message}`); }
+  }
+  throw new Error(why.join('; '));
+}
 const fill = (rec, key, val) => { if (val && !rec[key]) { rec[key] = String(val).slice(0, 2000); return true; } return false; };
 
 async function enrichX(it) {
   const id = statusId(it.url);
   if (!id) return false;
   // Documented v2 endpoint first ({ status }), older v1 endpoint as a fallback ({ tweet }).
-  const t = (await get(`${FX}/2/status/${id}`, true).catch(() => null))?.status
-    || (await get(`${FX}/status/${id}`, true).catch(() => null))?.tweet;
-  if (!t || !t.author) return false;
+  let t;
+  try { t = await firstJson([`${FX}/2/status/${id}`], 'status'); } catch (e) { t = await firstJson([`${FX}/status/${id}`], 'tweet'); }
+  if (!t.author) return false;
   let ch = false;
   const art = t.article;
   if (art && art.title) ch = fill(it, 'title', art.title) || ch;
@@ -77,13 +90,17 @@ async function enrichYouTube(it) {
 async function enrichPerson(c) {
   if (c.platform !== 'x' || !c.handle) return false;
   const h = encodeURIComponent(c.handle);
-  const u = (await get(`${FX}/2/profile/${h}`, true).catch(() => null))?.user
-    || (await get(`${FX}/${h}`, true).catch(() => null))?.user;
-  if (!u) return false;
+  const u = await firstJson([`${FX}/2/profile/${h}`, `${FX}/${h}`], 'user');
   let ch = fill(c, 'name', u.name);
   ch = fill(c, 'avatar', (u.avatar_url || '').replace('_normal.', '_400x400.')) || ch;
   ch = fill(c, 'bio', u.description) || ch;
   return ch;
+}
+
+// A failed lookup is retried on the next runs; after 3 failures we stop trying.
+function giveUpOrRetry(rec) {
+  rec.enrichTries = (rec.enrichTries || 0) + 1;
+  if (rec.enrichTries >= 3) rec.enriched = now;
 }
 
 for (const it of db.items || []) {
@@ -96,10 +113,11 @@ for (const it of db.items || []) {
       : /^https:\/\/github\.com\//.test(it.url) ? false // the app builds GitHub preview images itself
       : await enrichWeb(it);
     console.log(`${ch ? 'updated' : 'nothing new'}: ${it.url}`);
+    it.enriched = now;
   } catch (e) {
-    console.log(`skipped ${it.url}: ${e.message}`);
+    console.log(`failed ${it.url}: ${e.message}`);
+    giveUpOrRetry(it);
   }
-  it.enriched = now;
   it.updated = now;
   changed++;
 }
@@ -107,8 +125,13 @@ for (const c of db.creators || []) {
   if (tried >= MAX) break;
   if (c.deleted || c.enriched) continue;
   tried++;
-  try { console.log(`${(await enrichPerson(c)) ? 'updated' : 'nothing new'}: ${c.url}`); } catch (e) { console.log(`skipped ${c.url}: ${e.message}`); }
-  c.enriched = now;
+  try {
+    console.log(`${(await enrichPerson(c)) ? 'updated' : 'nothing new'}: ${c.url}`);
+    c.enriched = now;
+  } catch (e) {
+    console.log(`failed ${c.url}: ${e.message}`);
+    giveUpOrRetry(c);
+  }
   c.updated = now;
   changed++;
 }
