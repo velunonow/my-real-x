@@ -1,46 +1,70 @@
 'use strict';
 /*
- * My Real X — a calm, curated alternative to the X "For You" feed.
+ * My Real X — a calm, curated collection instead of the X "For You" feed.
  * No X API, no server. Data lives in data.json (optionally synced to GitHub)
- * plus this browser's localStorage.
+ * plus this browser's localStorage. Visual rules live in DESIGN.md.
  */
 
 const DEFAULT_TAGS = ['AI', 'Business', 'Learning', 'Writing'];
 const LS = { data: 'mrx.data.v1', sync: 'mrx.sync.v1', usage: 'mrx.usage.v1' };
 const TRIAL_DAYS = 14;
 const TRUSTED_SOFT_MAX = 30;
-const LIB_PAGE = 30;
+const LIB_PAGE = 40;
 
 const PROMPTS = [
   'Rewrite your best takeaway this week in your own words, for a beginner.',
   'Politely disagree with one thing you read recently. Why?',
   'Share one mistake you made and what it taught you.',
   'Write a 5-step how-to about something you do every week.',
-  'Combine two ideas from your Library into one new idea.',
+  'Combine two things from your collection into one new idea.',
   'Write the post you wish you had read one year ago.',
   'Explain an AI tool you use as if to your parents.',
-  'Pick a small business problem. How could AI fix it? Sketch it.',
-  'Write a 3-post thread: problem → insight → action.',
-  'Turn one of your ideas into a hook + 3 bullet outline.',
-  'Build in public: document something you tried today.',
+  'Pick a small business problem. How could AI fix it?',
+  'Write a 3-post thread: problem, insight, action.',
+  'Turn one of your ideas into a hook and three bullet points.',
+  'Build in public: write down something you tried today.',
   'List 10 ideas in 10 minutes. Quantity, not quality.',
   'Share one prompt that saves you time. Show before and after.',
-  'Answer a question someone asked you recently — publicly.',
+  'Answer a question someone asked you recently, publicly.',
   'Write a strong opinion you hold that most people don’t.',
-  'Summarize an article or video in 3 lines, then add your own verdict.',
+  'Summarise something you read in 3 lines, then add your verdict.',
   'Try a new tool for 20 minutes and report what happened.',
   'Write about the creator who influenced you most, and why.',
-  'Describe your process for something you’re good at, step by step.',
+  'Describe your process for something you’re good at.',
   'Finish an old draft today. Done is better than perfect.',
   'What did you learn this week that changed your mind?',
   'Teach one thing in under 280 characters.',
   'Make a checklist other people could copy and use.',
-  'Write a short story about a customer whose problem you solved.',
   'What would you tell a friend starting in AI today?',
-  'Turn a takeaway into a tiny experiment you can run tomorrow.',
-  'Write a “myth vs reality” post about your field.',
-  'Remix a post you liked: same topic, your experience.',
+  'Turn a takeaway into a tiny experiment for tomorrow.',
+  'Remix a post you liked: same topic, your own experience.',
 ];
+
+/* ---------- icons (one stroke family) ---------- */
+const ICONS = {
+  today: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/>',
+  collect: '<path d="M6.5 3.5h11v17l-5.5-3.8-5.5 3.8z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+  people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.9.7 3.1 2.5 3.5 5.2"/>',
+  settings: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  open: '<path d="M7 17L17 7M8 7h9v9"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+  clipboard: '<rect x="5.5" y="4.5" width="13" height="16" rx="2.5"/><path d="M9 4.5h6v3H9z"/>',
+  layers: '<path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12.5l8.5 4.5 8.5-4.5"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  play: '<path d="M8 5.5l10.5 6.5L8 18.5z"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.3 2.7-5.6 3.8-8.8 1.4 1.7 1.9 3.2 1.9 4.6 1-.9 1.9-2.4 1.9-3.9 2.9 2.4 5.4 5.3 5.4 8.1 0 3.6-2.6 6.2-6.5 6.2z"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
+  send: '<path d="M4.5 12L20 4.5 15.5 20l-3.2-6.4z"/><path d="M12.3 13.6L20 4.5"/>',
+  undo: '<path d="M9 14L4.5 9.5 9 5"/><path d="M4.5 9.5H14a5.5 5.5 0 0 1 0 11h-3"/>',
+  archive: '<path d="M4 8h16v11.5H4zM3 4.5h18V8H3zM10 12h4"/>',
+};
+const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -53,8 +77,8 @@ const today = () => localDate(new Date());
 const dayOf = (iso) => (iso ? localDate(new Date(iso)) : '');
 const daysSince = (iso) => (iso ? Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 864e5)) : 0);
 const safeHref = (u) => (/^https?:\/\//i.test(u || '') ? u : '#');
-const dark = () => window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
-const opts = (pairs, sel) => pairs.map(([v, l]) => `<option value="${esc(v)}" ${v === sel ? 'selected' : ''}>${esc(l)}</option>`).join('');
+const clip = (s, n) => { s = String(s || ''); return s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s; };
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many || `${one}s`}`;
 function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
 function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
 function forget(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } }
@@ -66,11 +90,9 @@ function toast(msg) {
 /* ---------- data ---------- */
 let db = normalize({});
 let view = 'today';
-const expanded = new Set();
-let openIdea = null;
 let libLimit = LIB_PAGE;
 let promptShift = 0;
-const filters = { lib: { q: '', type: '', status: 'unread', tag: '' }, people: { status: 'trusted', tag: '' } };
+const filters = { lib: { q: '', status: '', tag: '' }, people: { status: 'trusted', tag: '' } };
 
 function normalize(d) {
   d = d && typeof d === 'object' ? d : {};
@@ -80,7 +102,7 @@ function normalize(d) {
   for (const k of ['creators', 'items', 'ideas']) out[k] = Array.isArray(d[k]) ? d[k].filter((x) => x && x.id) : [];
   return out;
 }
-// Merge two copies record-by-record; the newer `updated` wins. Deletions are kept as tombstones.
+// Merge two copies record by record; the newer `updated` wins. Deletions are kept as tombstones.
 function mergeDb(a, b) {
   const out = normalize({});
   out.settings = (a.settings.updated || '') >= (b.settings.updated || '') ? a.settings : b.settings;
@@ -120,6 +142,11 @@ function ensureTags(tags) {
   let changed = false;
   tags.forEach((x) => { if (!t.some((y) => y.toLowerCase() === x.toLowerCase())) { t.push(x); changed = true; } });
   if (changed) setSettings({ tags: t });
+}
+function allTags() {
+  const set = new Set(db.settings.tags);
+  live('items').concat(live('creators'), live('ideas')).forEach((x) => (x.tags || []).forEach((t) => set.add(t)));
+  return [...set];
 }
 function addDay(idea) {
   const d = today();
@@ -208,7 +235,7 @@ async function pullRemote() {
     if (r) { db = mergeDb(db, r.data); remoteSha = r.sha; } else remoteSha = null;
     store(LS.data, db);
     const after = JSON.stringify(db);
-    if (after !== before && !isEditing()) render();
+    if (after !== before && !isBusy()) render();
     if (!r || JSON.stringify(r.data) !== after) save(); else setSync('synced');
   } catch (e) {
     setSync('error', e.message);
@@ -216,9 +243,10 @@ async function pullRemote() {
 }
 function setSync(state, msg) {
   const el = $('#sync');
-  const labels = { local: '💾 This device', pending: '⏳ Unsaved', saving: '🔄 Syncing', synced: '☁️ Synced', error: '⚠️ Sync error' };
+  const labels = { local: 'This device', pending: 'Saving…', saving: 'Syncing…', synced: 'Synced', error: 'Sync error' };
   el.textContent = labels[state] || '';
   el.title = msg || (state === 'local' ? 'Saved in this browser only. Tap to set up sync.' : 'Sync status');
+  el.style.color = state === 'error' ? 'var(--danger)' : '';
   const m = $('#syncMsg');
   if (m && msg) m.textContent = `Error: ${msg}`;
 }
@@ -247,17 +275,21 @@ function tick() {
   if (gated && document.visibilityState === 'visible' && !locked()) {
     usage.sec++;
     if (usage.sec % 5 === 0) store(LS.usage, usage);
-    if (locked()) { store(LS.usage, usage); if (!isEditing()) render(); }
+    if (locked()) { store(LS.usage, usage); if (!isBusy()) render(); }
   }
   renderTimer();
+}
+function minutesLeft() {
+  const lim = limitSec();
+  return lim === Infinity ? null : Math.max(0, Math.ceil((lim - usage.sec) / 60));
 }
 function renderTimer() {
   const el = $('#timer');
   const lim = limitSec();
   if (lim === Infinity) { el.textContent = ''; return; }
-  if (locked()) { el.textContent = '📕 Reading done'; return; }
+  if (locked()) { el.textContent = 'Reading done'; return; }
   const left = lim - usage.sec;
-  el.textContent = `📖 ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+  el.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')} left`;
 }
 
 /* ---------- making stats ---------- */
@@ -279,13 +311,17 @@ function weekStats() {
     pub: live('ideas').filter((i) => i.publishedAt && dayOf(i.publishedAt) >= cutoff).length,
   };
 }
-function streakText() {
+function streakHtml() {
   const n = makingStreak();
-  return n ? `🔥 ${n}-day making streak` : 'Make one thing today to start a streak';
+  return n ? `<span class="streak">${icon('flame')}${plural(n, 'day')} of making</span>` : '<span class="streak">Make one thing to start a streak</span>';
 }
 function currentPrompt() {
   const dayNum = Math.floor(new Date(today()).getTime() / 864e5);
   return PROMPTS[(dayNum + promptShift) % PROMPTS.length];
+}
+function greeting() {
+  const h = new Date().getHours();
+  return h < 5 ? 'Still up?' : h < 12 ? 'Good morning.' : h < 18 ? 'Good afternoon.' : 'Good evening.';
 }
 
 /* ---------- URL parsing ---------- */
@@ -320,28 +356,38 @@ function parseUrl(raw) {
   return { kind: 'item', type: 'web', platform: 'web', handle: '', url: u.href };
 }
 function hostOf(url) {
-  try { const u = new URL(url); return (u.hostname.replace(/^www\./, '') + u.pathname).replace(/\/$/, '').slice(0, 70); } catch (e) { return url; }
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return url; }
 }
-const typeIcon = (t) => ({ x: '𝕏', youtube: '▶️', web: '📄' }[t] || '📄');
-const platformLabel = (p) => ({ x: '𝕏', youtube: 'YouTube', web: 'Web' }[p] || 'Web');
+function pathOf(url) {
+  try { const u = new URL(url); return (u.hostname.replace(/^www\./, '') + u.pathname).replace(/\/$/, ''); } catch (e) { return url; }
+}
 function itemTitle(it) {
   if (it.title) return it.title;
-  if (it.type === 'x') return it.handle ? `Post by @${it.handle}` : 'X post';
+  if (it.type === 'x') return it.author ? `A post by ${it.author}` : 'A post on X';
   if (it.type === 'youtube') return 'YouTube video';
-  return hostOf(it.url);
+  return pathOf(it.url);
+}
+function sourceLine(it) {
+  if (it.type === 'x') return it.handle ? `${it.author ? `${it.author} · ` : ''}@${it.handle} on X` : 'X';
+  if (it.type === 'youtube') return it.author ? `${it.author} · YouTube` : 'YouTube';
+  return it.site || hostOf(it.url);
+}
+const typeIcon = (it) => (it.type === 'x' ? '' : icon(it.type === 'youtube' ? 'play' : 'link'));
+function itemImage(it) {
+  if (it.image) return it.image;
+  if (it.type === 'youtube' && /^[\w-]{6,20}$/.test(it.videoId || '')) return `https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg`;
+  const gh = /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+)/.exec(it.url || '');
+  if (gh) return `https://opengraph.githubassets.com/1/${gh[1]}/${gh[2]}`;
+  return '';
+}
+function avatarHtml(c, cls = '') {
+  const label = (c.name || c.handle || hostOf(c.url) || '?').replace(/^@/, '').charAt(0).toUpperCase();
+  const src = c.avatar || (c.platform === 'x' && c.handle ? `https://unavatar.io/x/${encodeURIComponent(c.handle)}?fallback=false`
+    : c.platform === 'youtube' && c.handle ? `https://unavatar.io/youtube/${encodeURIComponent(c.handle)}?fallback=false` : '');
+  return `<span class="avatar ${cls}">${esc(label)}${src ? `<img src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`;
 }
 const ideaTitle = (i) => i.title || (i.body || '').split('\n')[0].slice(0, 80) || 'Untitled idea';
 const intentUrl = (i) => `https://x.com/intent/tweet?text=${encodeURIComponent((i.body || i.title || '').trim())}`;
-async function fetchMeta(url) {
-  try {
-    const ctl = new AbortController();
-    const t = setTimeout(() => ctl.abort(), 5000);
-    const r = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url.replace('://x.com/', '://twitter.com/'))}`, { signal: ctl.signal });
-    clearTimeout(t);
-    const j = await r.json();
-    return j.error ? null : j;
-  } catch (e) { return null; }
-}
 
 /* ---------- embeds ---------- */
 let twLoading = null;
@@ -359,76 +405,88 @@ function loadTwitter(el) {
   twLoading.then(() => window.twttr && window.twttr.widgets && window.twttr.widgets.load(el));
 }
 function embedHtml(it) {
-  if (it.type === 'x') {
-    return `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${dark() ? 'dark' : 'light'}"><a href="${esc(safeHref(it.url))}">Loading post… (open on X)</a></blockquote>`;
-  }
+  if (it.type === 'x') return `<div class="pad"><blockquote class="twitter-tweet" data-dnt="true"><a href="${esc(safeHref(it.url))}">Loading the post…</a></blockquote></div>`;
   if (it.type === 'youtube' && /^[\w-]{6,20}$/.test(it.videoId || '')) {
     return `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${it.videoId}" title="YouTube video" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`;
   }
-  return '';
+  const img = itemImage(it);
+  return img ? `<img class="media" src="${esc(img)}" alt="" onerror="this.remove()">` : '';
 }
-const canEmbed = (it) => it.type === 'x' || it.type === 'youtube';
 
-/* ---------- small renderers ---------- */
-const tagsHtml = (tags) => (tags && tags.length ? `<div class="tags">${tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : '');
-function allTags() {
-  const set = new Set(db.settings.tags);
-  live('items').concat(live('creators'), live('ideas')).forEach((x) => (x.tags || []).forEach((t) => set.add(t)));
-  return [...set];
+/* ---------- small pieces ---------- */
+const imgTag = (src, cls = 'media') => (src ? `<img class="${cls}" src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">` : '');
+function chipsHtml(pairs, active, attrs) {
+  return pairs.map(([val, label, n]) => `<button type="button" class="chip" ${attrs(val)} aria-pressed="${val === active}">${esc(label)}${n !== undefined ? `<span class="n">${n}</span>` : ''}</button>`).join('');
 }
-function tagPicker(selected) {
-  return `<fieldset class="tagpick"><legend>Tags</legend>
-    ${allTags().map((t) => `<label class="chip"><input type="checkbox" name="tag" value="${esc(t)}" ${selected.includes(t) ? 'checked' : ''}>${esc(t)}</label>`).join('')}
-    <input name="newTags" placeholder="New tags, comma separated" autocomplete="off"></fieldset>`;
+function tagChips(selected, scope) {
+  return `<div class="chips wrap">${allTags().map((t) => `<button type="button" class="chip" data-act="tag-toggle" data-scope="${scope}" data-tag="${esc(t)}" aria-pressed="${selected.includes(t)}">${esc(t)}</button>`).join('')}
+    <input class="chip-input" data-newtag="${scope}" placeholder="+ New tag" enterkeyhint="done" autocomplete="off"></div>`;
 }
 function lockedHtml() {
-  return `<section class="card locked">
-    <h2>Reading time is done for today ✅</h2>
-    <p>You chose ${esc(db.settings.dailyMinutes)} minutes. Everything will still be here tomorrow.<br>Now use what you learned.</p>
-    <div class="row" style="justify-content:center"><button class="primary" data-act="goto" data-view="create">Go create</button>
-    <button data-act="bonus">I really need 5 more minutes</button></div></section>`;
+  return `<section class="field-moment">
+    <h2 class="display">That’s enough reading for today.</h2>
+    <p>You chose ${plural(Number(db.settings.dailyMinutes), 'minute')}. Everything will still be here tomorrow. Now use what you learned.</p>
+    <div class="choice-grid">
+      <button type="button" class="choice tilt-l" data-act="goto" data-view="create">${icon('pen')}<span>Make something</span></button>
+      <button type="button" class="choice dark tilt-r" data-act="bonus">${icon('clock')}<span>5 more minutes</span></button>
+    </div></section>`;
 }
-function itemCard(it, embed = false) {
-  const open = embed || expanded.has(it.id);
-  const statusLabel = it.status === 'archived' ? 'dropped' : it.status;
-  return `<article class="card item" data-card="${it.id}" data-kind="items" data-embed="${embed ? 1 : 0}">
-    <div class="row between">
-      <div class="meta">${typeIcon(it.type)} <a href="${esc(safeHref(it.url))}" target="_blank" rel="noopener">${esc(itemTitle(it))}</a>
-        ${it.handle && it.title ? `<span class="muted">· @${esc(it.handle)}</span>` : ''}</div>
-      <span class="badge s-${it.status}">${esc(statusLabel)}</span>
-    </div>
-    ${tagsHtml(it.tags)}
-    ${it.note ? `<p class="note">${esc(it.note)}</p>` : ''}
-    ${it.takeaway ? `<p class="takeaway">💡 ${esc(it.takeaway)}</p>` : ''}
-    ${open && canEmbed(it) ? `<div class="embed">${embedHtml(it)}</div>` : ''}
-    <div class="actions">
-      ${!embed && canEmbed(it) ? `<button data-act="toggle">${open ? 'Hide' : 'Show'}</button>` : ''}
-      ${it.status === 'unread' || it.status === 'archived' ? '<button class="primary" data-act="done">✓ Done</button>' : ''}
-      <button data-act="make-idea">✍️ Make from this</button>
-      <button data-act="edit">Edit</button>
-      ${it.status === 'unread' ? '<button data-act="keep" title="Not for daily reading — keep for when I need it">Keep as reference</button><button data-act="archive" title="Not worth my time">Drop</button>'
-        : it.status === 'reference' ? '<button data-act="unread">Move to reading</button>' : '<button data-act="unread">Mark unread</button>'}
-    </div>
-    <div class="slot"></div>
+
+/* ---------- cards ---------- */
+function featureCard(it) {
+  const img = itemImage(it);
+  const text = it.type === 'x' && it.text;
+  return `<article class="card" data-card="${it.id}" data-kind="items">
+    ${img ? `<div data-open>${imgTag(img)}</div>` : ''}
+    <div class="pad">
+      <p class="src">${typeIcon(it)}<span>${esc(sourceLine(it))}</span></p>
+      <div data-open>${text ? `<p class="post-text">${esc(clip(it.text, 500))}</p>` : `<h3 class="title">${esc(itemTitle(it))}</h3>`}</div>
+      ${it.note ? `<p class="note">${esc(it.note)}</p>` : ''}
+      <div class="actions">
+        <button type="button" class="btn primary" data-act="done">${icon('check')}Done</button>
+        <button type="button" class="btn soft" data-act="open">Read</button>
+        <button type="button" class="btn quiet" data-act="make-idea">${icon('pen')}Make from this</button>
+      </div>
+      <div class="slot"></div>
+    </div></article>`;
+}
+function tileCard(it) {
+  const img = itemImage(it);
+  const quote = it.type === 'x' && it.text && !img;
+  const flag = it.status === 'unread' ? '<span class="flag">To read</span>' : it.status === 'archived' ? '<span class="flag muted">Dropped</span>' : '';
+  return `<article class="card tile ${quote ? 'quote' : ''}" data-card="${it.id}" data-kind="items" data-open>
+    ${imgTag(img)}
+    <div class="tile-body">
+      ${quote ? `<p class="q">${esc(clip(it.text, 320))}</p>` : `<h3 class="t">${esc(itemTitle(it))}</h3>`}
+      <p class="src">${typeIcon(it)}<span>${esc(sourceLine(it))}</span></p>
+      ${flag}
+    </div></article>`;
+}
+function rowCard(it) {
+  const img = itemImage(it);
+  return `<article class="card rowcard" data-card="${it.id}" data-kind="items" data-open>
+    ${img ? imgTag(img, 'thumb') : `<span class="thumb" style="display:grid;place-items:center;color:var(--faint)">${typeIcon(it)}</span>`}
+    <span class="t">${esc(itemTitle(it))}</span>${icon('check')}</article>`;
+}
+function ideaCard(i) {
+  const label = { idea: 'Idea', draft: 'Draft', published: 'Published' }[i.status] || 'Idea';
+  return `<article class="card tile" data-card="${i.id}" data-kind="ideas" data-open>
+    <div class="tile-body">
+      <h3 class="t">${esc(ideaTitle(i))}</h3>
+      ${i.body ? `<p class="note" style="margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">${esc(clip(i.body, 220))}</p>` : ''}
+      <span class="flag ${i.status === 'published' ? '' : 'muted'}">${label}</span>
+    </div></article>`;
+}
+function personCard(c) {
+  const trialDay = daysSince(c.trialStart || c.added) + 1;
+  const due = c.status === 'trial' && trialDay > TRIAL_DAYS;
+  return `<article class="card tile person" data-card="${c.id}" data-kind="creators" data-open>
+    ${avatarHtml(c)}
+    <h3 class="name">${esc(c.name || (c.handle ? c.handle : hostOf(c.url)))}</h3>
+    <p class="handle">${c.handle ? `@${esc(c.handle)}` : esc(hostOf(c.url))}</p>
+    ${c.note ? `<p class="note">${esc(c.note)}</p>` : ''}
+    ${c.status === 'trial' ? `<span class="flag ${due ? '' : 'muted'}">${due ? 'Keep or drop?' : `Trial · day ${Math.min(trialDay, TRIAL_DAYS)} of ${TRIAL_DAYS}`}</span>` : ''}
   </article>`;
-}
-function takeawayForm(it) {
-  return `<label>One-line takeaway — what will you use or make from this?
-      <textarea rows="2" placeholder="e.g. Use 3 examples in every prompt">${esc(it.takeaway || '')}</textarea></label>
-    <div class="actions"><button class="primary" data-act="done-save">Save</button>
-      <button data-act="done-idea">Save + turn into idea</button><button data-act="done-cancel">Cancel</button></div>`;
-}
-function refreshCard(kind, id) {
-  const el = $(`[data-card="${id}"]`);
-  const rec = byId(kind, id);
-  if (!el) return;
-  if (!rec) { el.remove(); return; }
-  const tpl = document.createElement('template');
-  tpl.innerHTML = kind === 'items' ? itemCard(rec, el.dataset.embed === '1' && rec.status === 'unread')
-    : kind === 'creators' ? creatorCard(rec) : ideaCard(rec);
-  const fresh = tpl.content.firstElementChild;
-  el.replaceWith(fresh);
-  loadTwitter(fresh);
 }
 
 /* ---------- views ---------- */
@@ -440,83 +498,47 @@ function renderToday() {
   const unread = items.filter((i) => i.status === 'unread').sort((a, b) => (a.added || '').localeCompare(b.added || ''));
   const todays = unread.slice(0, Math.max(0, s.todayCount - readToday.length));
   const wk = weekStats();
-  let html = `<section class="card hero">
-    <div class="row between"><h2>Make one thing today</h2><span class="streak">${streakText()}</span></div>
-    <p class="prompt">“${esc(currentPrompt())}”</p>
-    <div class="row"><button class="primary" data-act="draft-from-prompt">Start writing</button>
-      <button data-act="another-prompt">Another prompt</button></div>
-    <p class="muted small">Last 7 days: read ${wk.read} · made ${wk.made} · published ${wk.pub}${wk.read > wk.made * 2 + 1 ? ' — you’re consuming more than making. Make something next.' : ''}</p>
-  </section>`;
+  const left = minutesLeft();
+  let html = `<section class="page-head">
+      <h1 class="display">${greeting()}</h1>
+      <p class="sub">${readToday.length} of ${s.todayCount} read today${left !== null && !locked() ? ` · ${plural(left, 'minute')} of reading left` : ''}</p>
+    </section>
+    <section class="card forest pad">
+      ${streakHtml()}
+      <p class="display-s" style="margin-top:14px">${esc(currentPrompt())}</p>
+      <div class="actions">
+        <button type="button" class="btn light" data-act="draft-from-prompt">${icon('pen')}Start writing</button>
+        <button type="button" class="btn ghost-light" data-act="another-prompt">Another prompt</button>
+      </div>
+      <p class="tiny" style="margin:16px 0 0">Last 7 days: read ${wk.read} · made ${wk.made} · published ${wk.pub}${wk.read > wk.made * 2 + 1 ? '. You’re reading more than making — make one thing next.' : ''}</p>
+    </section>`;
   if (locked()) return html + lockedHtml();
-  html += `<div class="row between"><h3>Today’s ${esc(s.todayCount)} to read</h3>
-    <span class="muted small">${readToday.length}/${esc(s.todayCount)} done · ${unread.length} unread in Library</span></div>`;
+  html += `<h2 class="section">Today’s reading<span class="count">${readToday.length}/${s.todayCount}</span></h2>`;
   if (!todays.length && readToday.length >= s.todayCount) {
-    html += '<div class="card done">✅ That’s today’s reading. The rest can wait until tomorrow — go make something.</div>';
+    html += `<div class="card empty"><p class="display-s">That’s today’s reading.</p>The rest can wait until tomorrow. Go make something.</div>`;
   } else if (!todays.length) {
-    html += `<div class="card empty">Nothing unread. Save posts, articles or videos with <b>+ Add</b>, or visit one of your
-      <a href="#" data-act="goto" data-view="people">people</a> on purpose.</div>`;
+    html += `<div class="card empty"><p class="display-s">Nothing waiting.</p>Tap <b>+</b> to save a post, article or video. Or visit one of your people on purpose.</div>`;
   }
-  html += todays.map((i) => itemCard(i, true)).join('');
-  if (readToday.length) {
-    html += `<details class="sec"><summary><h3>Read today <span class="muted">(${readToday.length})</span></h3></summary>${readToday.map((i) => itemCard(i)).join('')}</details>`;
-  }
+  html += todays.map(featureCard).join('');
+  if (readToday.length) html += `<h2 class="section">Read today<span class="count">${readToday.length}</span></h2>${readToday.map(rowCard).join('')}`;
   return html;
 }
 
-function ideaCard(i) {
-  const src = i.sourceId ? byId('items', i.sourceId) : null;
-  const head = `<div class="row between" data-act="toggle"><b>${esc(ideaTitle(i))}</b><span class="badge s-${i.status}">${esc(i.status)}</span></div>`;
-  if (openIdea !== i.id) {
-    return `<article class="card idea" data-card="${i.id}" data-kind="ideas">${head}
-      <p class="muted small" style="margin:4px 0 0">Worked on ${(i.days || []).length} day(s)${src ? ` · from ${esc(itemTitle(src))}` : ''}${i.status === 'published' && i.publishedAt ? ` · published ${esc(dayOf(i.publishedAt))}` : ''}</p></article>`;
-  }
-  return `<article class="card idea open" data-card="${i.id}" data-kind="ideas">${head}
-    <input class="i-title" placeholder="Title / hook" value="${esc(i.title || '')}">
-    <textarea class="i-body" rows="9" placeholder="Write freely. Done is better than perfect.">${esc(i.body || '')}</textarea>
-    <div class="row between small muted"><span class="count">${(i.body || '').length} chars</span>
-      ${src ? `<span>from <a href="${esc(safeHref(src.url))}" target="_blank" rel="noopener">${esc(itemTitle(src))}</a></span>` : ''}</div>
-    <div class="actions">
-      <a class="btn primary" target="_blank" rel="noopener" data-role="intent" href="${esc(intentUrl(i))}">Post on X ↗</a>
-      ${i.status !== 'published' ? '<button data-act="publish">Mark published</button>'
-        : `${i.publishedUrl ? `<a class="btn" target="_blank" rel="noopener" href="${esc(safeHref(i.publishedUrl))}">View post ↗</a>` : ''}<button data-act="unpublish">Back to draft</button>`}
-      <button data-act="copy">Copy</button>
-      <button data-act="close-idea">Close</button>
-      <button class="danger" data-act="del-idea">Delete</button>
-    </div></article>`;
-}
-function ideaSection(title, list, open) {
-  return `<details class="sec" ${open ? 'open' : ''}><summary><h3>${title} <span class="muted">(${list.length})</span></h3></summary>
-    ${list.length ? list.map(ideaCard).join('') : '<p class="muted small">Nothing here yet.</p>'}</details>`;
-}
-function renderCreate() {
-  const all = live('ideas').sort((a, b) => (b.updated || '').localeCompare(a.updated || ''));
-  return `<section class="card hero">
-      <div class="row between"><h2>Create</h2><span class="streak">${streakText()}</span></div>
-      <form data-form="quick" class="row"><input name="text" placeholder="Capture an idea before it disappears…" autocomplete="off"><button class="primary">Add</button></form>
-      <p class="prompt">“${esc(currentPrompt())}”</p>
-      <div class="row"><button data-act="draft-from-prompt">Write this</button><button data-act="another-prompt">Another prompt</button></div>
-      <p class="muted small">Rule of thumb: for every 2 things you read, make 1 thing. Small counts.</p>
-    </section>
-    ${ideaSection('Drafts', all.filter((i) => i.status === 'draft'), true)}
-    ${ideaSection('Ideas', all.filter((i) => i.status === 'idea'), true)}
-    ${ideaSection('Published', all.filter((i) => i.status === 'published'), false)}`;
-}
-
 function renderLibrary() {
-  if (locked()) return lockedHtml();
+  if (locked()) return `<section class="page-head"><h1 class="display">Collection</h1></section>${lockedHtml()}`;
   const f = filters.lib;
-  const tags = allTags();
-  return `<section class="card">
-      <div class="row">
-        <input type="search" data-filter="lib.q" placeholder="Search titles, notes, @handles…" value="${esc(f.q)}">
-      </div>
-      <div class="row">
-        <select data-filter="lib.status">${opts([['unread', 'Unread'], ['reference', 'Reference'], ['read', 'Read'], ['archived', 'Dropped'], ['', 'All']], f.status)}</select>
-        <select data-filter="lib.type">${opts([['', 'All types'], ['x', '𝕏 posts'], ['youtube', 'YouTube'], ['web', 'Articles / web']], f.type)}</select>
-        <select data-filter="lib.tag">${opts([['', 'All tags'], ...tags.map((t) => [t, t]), ['__none', 'No tag yet']], f.tag)}</select>
-      </div>
-      <div class="row"><button class="primary" data-act="open-add">+ Add</button><button data-act="bulk">Bulk add (clean up bookmarks)</button></div>
-    </section><div id="libList"></div>`;
+  const items = live('items');
+  const count = (st) => items.filter((i) => i.status === st).length;
+  return `<section class="page-head">
+      <h1 class="display">Collection</h1>
+      <p class="sub">${plural(items.length, 'thing')} you chose to keep.</p>
+    </section>
+    <div class="search">${icon('search')}<input type="search" data-filter="lib.q" placeholder="Search your collection" value="${esc(f.q)}" enterkeyhint="search"></div>
+    <div class="chips">${chipsHtml([['', 'Everything', items.length], ['unread', 'To read', count('unread')], ['reference', 'Reference', count('reference')], ['read', 'Read', count('read')], ['archived', 'Dropped', count('archived')]], f.status,
+      (v) => `data-act="filter" data-group="lib" data-key="status" data-val="${esc(v)}"`)}</div>
+    <div class="chips">${chipsHtml([['', 'All tags'], ...allTags().map((t) => [t, t]), ['__none', 'No tag yet']], f.tag,
+      (v) => `data-act="filter" data-group="lib" data-key="tag" data-val="${esc(v)}"`)}</div>
+    <div id="libList"></div>`;
 }
 function renderLibList() {
   const el = $('#libList');
@@ -524,62 +546,63 @@ function renderLibList() {
   const f = filters.lib;
   const q = f.q.trim().toLowerCase();
   const list = live('items').filter((i) => (!f.status || i.status === f.status) &&
-      (!f.type || i.type === f.type) &&
       (!f.tag || (f.tag === '__none' ? !(i.tags || []).length : (i.tags || []).includes(f.tag))) &&
-      (!q || [i.title, i.note, i.takeaway, i.handle, i.url, ...(i.tags || [])].join(' ').toLowerCase().includes(q)))
+      (!q || [i.title, i.note, i.text, i.takeaway, i.handle, i.author, i.url, ...(i.tags || [])].join(' ').toLowerCase().includes(q)))
     .sort((a, b) => (b.added || '').localeCompare(a.added || ''));
-  el.innerHTML = `<p class="muted small">${list.length} item(s)</p>${list.slice(0, libLimit).map((i) => itemCard(i)).join('')}
-    ${list.length > libLimit ? '<button data-act="more-lib">Show more</button>' : ''}`;
-  loadTwitter(el);
+  el.innerHTML = list.length
+    ? `<div class="masonry">${list.slice(0, libLimit).map(tileCard).join('')}</div>${list.length > libLimit ? '<button type="button" class="btn block" data-act="more-lib">Show more</button>' : ''}`
+    : '<div class="card empty"><p class="display-s">Nothing here.</p>Try another filter, or tap + to add something.</div>';
 }
 
-function creatorCard(c) {
-  const saved = c.handle ? live('items').filter((i) => (i.handle || '').toLowerCase() === c.handle.toLowerCase()).length : 0;
-  const trialDays = daysSince(c.trialStart || c.added);
-  return `<article class="card person" data-card="${c.id}" data-kind="creators">
-    <div class="row between">
-      <div class="meta"><b>${esc(c.name || (c.handle ? '@' + c.handle : hostOf(c.url)))}</b>
-        ${c.handle && c.name ? `<span class="muted">@${esc(c.handle)}</span>` : ''} <span class="badge">${platformLabel(c.platform)}</span></div>
-      <span class="badge s-${c.status}">${c.status === 'trial' ? `trial · day ${trialDays + 1}` : 'trusted'}</span>
-    </div>
-    ${tagsHtml(c.tags)}
-    ${c.note ? `<p class="note">${esc(c.note)}</p>` : ''}
-    <p class="muted small" style="margin:6px 0 0">${saved} saved item(s)${c.foundVia ? ` · found via ${esc(c.foundVia)}` : ''}</p>
-    ${c.status === 'trial' && trialDays >= TRIAL_DAYS ? '<p class="warn small">Trial is over. Did they help you make things — or just keep you busy?</p>' : ''}
-    <div class="actions">
-      <a class="btn primary" href="${esc(safeHref(c.url))}" target="_blank" rel="noopener">Visit ↗</a>
-      ${c.status === 'trial' ? '<button data-act="promote">Keep (trusted)</button>' : '<button data-act="demote">Move to trial</button>'}
-      <button data-act="edit">Edit</button>
-      <button class="danger" data-act="drop-creator">Drop</button>
-    </div></article>`;
+function renderCreate() {
+  const all = live('ideas').sort((a, b) => (b.updated || '').localeCompare(a.updated || ''));
+  const group = (st) => all.filter((i) => i.status === st);
+  const section = (title, list) => (list.length ? `<h2 class="section">${title}<span class="count">${list.length}</span></h2><div class="masonry">${list.map(ideaCard).join('')}</div>` : '');
+  return `<section class="page-head">
+      <h1 class="display">Create</h1>
+      <p class="sub">${streakHtml()}</p>
+    </section>
+    <form data-form="quick" class="card pad" style="display:flex;gap:10px;align-items:center;padding:10px 10px 10px 18px">
+      <input class="plain" name="text" placeholder="A thought worth keeping…" autocomplete="off" style="font-family:var(--serif);font-size:19px">
+      <button class="btn primary">Save</button>
+    </form>
+    <section class="card forest pad">
+      <p class="display-s">${esc(currentPrompt())}</p>
+      <div class="actions">
+        <button type="button" class="btn light" data-act="draft-from-prompt">${icon('pen')}Write this</button>
+        <button type="button" class="btn ghost-light" data-act="another-prompt">Another prompt</button>
+      </div>
+      <p class="tiny" style="margin:14px 0 0">For every two things you read, make one. Small counts.</p>
+    </section>
+    ${section('Drafts', group('draft'))}${section('Ideas', group('idea'))}${section('Published', group('published'))}
+    ${all.length ? '' : '<div class="card empty" style="margin-top:14px"><p class="display-s">Your first idea goes here.</p>Write a thought above, or tap “Make from this” on anything you read.</div>'}`;
 }
+
 function renderPeople() {
   const s = db.settings;
   const f = filters.people;
   const people = live('creators');
-  const trusted = people.filter((c) => c.status === 'trusted').length;
-  const trialDue = people.filter((c) => c.status === 'trial' && daysSince(c.trialStart || c.added) >= TRIAL_DAYS).length;
-  return `<section class="card hero">
-      <h2>My people</h2>
-      <p class="muted small">Visit people on purpose: open their profile, read, leave. Trusted: ${trusted}${trusted > TRUSTED_SOFT_MAX ? ` — more than ${TRUSTED_SOFT_MAX}. Adding one? Consider dropping one.` : ''}</p>
-      ${s.xListUrl ? `<a class="btn primary" href="${esc(safeHref(s.xListUrl))}" target="_blank" rel="noopener">Open my X List ↗</a>`
-        : '<p class="small">💡 Tip: put your trusted people in a private <b>X List</b> and save its link in ⚙︎ Settings. A List shows only them, newest first — no “For You”.</p>'}
-      ${trialDue ? `<p class="warn">${trialDue} person(s) finished their ${TRIAL_DAYS}-day trial — keep or drop?</p>` : ''}
-      <div class="row">
-        <select data-filter="people.status">${opts([['trusted', 'Trusted'], ['trial', 'On trial'], ['', 'Everyone']], f.status)}</select>
-        <select data-filter="people.tag">${opts([['', 'All tags'], ...allTags().map((t) => [t, t])], f.tag)}</select>
-        <button data-act="open-add" data-kind="creator">+ Add person</button>
-      </div>
+  const n = (st) => people.filter((c) => c.status === st).length;
+  const trusted = n('trusted');
+  return `<section class="page-head">
+      <h1 class="display">People</h1>
+      <p class="sub">Visit on purpose. Read, then leave.${trusted > TRUSTED_SOFT_MAX ? ` You trust ${trusted} people — adding one? Consider dropping one.` : ''}</p>
     </section>
+    ${s.xListUrl ? `<a class="card forest pad" href="${esc(safeHref(s.xListUrl))}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;text-decoration:none">
+        <span class="display-s" style="flex:1">Open my X List</span>${icon('open')}</a>`
+      : `<div class="card pad small muted">Put your trusted people in a private <b>X List</b> and paste its link in Settings. A List shows only them, newest first — no “For You”.</div>`}
+    <div class="chips" style="margin-top:18px">${chipsHtml([['trusted', 'Trusted', trusted], ['trial', 'On trial', n('trial')], ['', 'Everyone', people.length]], f.status,
+      (v) => `data-act="filter" data-group="people" data-key="status" data-val="${esc(v)}"`)}</div>
+    <div class="chips">${chipsHtml([['', 'All tags'], ...allTags().map((t) => [t, t])], f.tag,
+      (v) => `data-act="filter" data-group="people" data-key="tag" data-val="${esc(v)}"`)}</div>
     <div id="peopleList"></div>
-    <details class="card"><summary><b>🔭 How to find new people (once a week, not every day)</b></summary>
+    <details class="card" style="margin-top:18px"><summary>How to find new people, once a week</summary>
       <ul class="small">
-        <li><b>Pick one slot a week</b> (e.g. Sunday, 20 minutes) for discovery. The rest of the week: no searching, no “For You”.</li>
-        <li><b>Follow the trail of people you trust</b>: who do they quote, reply to, recommend or interview? Their picks are pre-filtered for you.</li>
-        <li>When you save a great post from someone new, tick <b>“Also add to People (on trial)”</b>.</li>
-        <li>For YouTube and blogs: check the newsletters, podcasts and blogrolls your trusted people mention.</li>
-        <li><b>${TRIAL_DAYS}-day trial rule:</b> keep someone only if they gave you an idea you used, or made you want to create.</li>
-        <li>Write “found via” — you’ll learn which people lead you to other good people.</li>
+        <li><b>One slot a week</b> (say Sunday, 20 minutes) for discovery. The rest of the week: no searching, no “For You”.</li>
+        <li><b>Follow the trail of people you trust</b>: who do they quote, reply to, recommend? Their picks are already filtered.</li>
+        <li>Saving a great post from someone new? Tap <b>Follow on trial</b> after saving it.</li>
+        <li>For YouTube and blogs: the newsletters, podcasts and blogrolls your trusted people mention.</li>
+        <li><b>${TRIAL_DAYS}-day trial:</b> keep someone only if they gave you an idea you used, or made you want to create.</li>
       </ul></details>`;
 }
 function renderPeopleList() {
@@ -588,59 +611,60 @@ function renderPeopleList() {
   const f = filters.people;
   const list = live('creators').filter((c) => (!f.status || c.status === f.status) && (!f.tag || (c.tags || []).includes(f.tag)))
     .sort((a, b) => (a.name || a.handle || '').localeCompare(b.name || b.handle || ''));
-  el.innerHTML = list.length ? list.map(creatorCard).join('')
-    : `<div class="card empty">No one here yet. ${f.status === 'trial' ? 'New people you add go here first.' : 'Add a person with an X, YouTube or blog link.'}</div>`;
+  el.innerHTML = list.length ? `<div class="masonry">${list.map(personCard).join('')}</div>`
+    : `<div class="card empty"><p class="display-s">No one here yet.</p>${f.status === 'trial' ? 'New people start here for two weeks.' : 'Tap + and paste someone’s profile link.'}</div>`;
 }
 
 function renderSettings() {
   const s = db.settings;
   const g = sync || guessSync();
-  return `<section class="card"><h2>Habits</h2>
+  return `<section class="page-head"><h1 class="display">Settings</h1></section>
+    <div class="settings">
+    <section class="card"><h3>Habits</h3>
       <div class="grid2">
-        <label>Daily reading limit (minutes, 0 = none)<input type="number" min="0" max="240" id="setMin" value="${esc(s.dailyMinutes)}"></label>
-        <label>Items in “Today” per day<input type="number" min="1" max="50" id="setCount" value="${esc(s.todayCount)}"></label>
+        <label><span class="field-label" style="margin-top:0">Daily reading minutes (0 = no limit)</span><input class="boxed" type="number" min="0" max="240" id="setMin" value="${esc(s.dailyMinutes)}" inputmode="numeric"></label>
+        <label><span class="field-label" style="margin-top:0">Things to read per day</span><input class="boxed" type="number" min="1" max="50" id="setCount" value="${esc(s.todayCount)}" inputmode="numeric"></label>
       </div>
-      <label>My X List link (optional)<input type="url" id="setList" placeholder="https://x.com/i/lists/…" value="${esc(s.xListUrl)}"></label>
-      <button class="primary" data-act="settings-save">Save</button>
+      <label><span class="field-label">My X List link (optional)</span><input class="boxed" type="url" id="setList" placeholder="https://x.com/i/lists/…" value="${esc(s.xListUrl)}"></label>
+      <div class="actions"><button type="button" class="btn primary" data-act="settings-save">Save</button></div>
     </section>
-    <section class="card"><h2>Tags</h2>
-      <div class="tags">${s.tags.map((t) => `<span class="tag">${esc(t)}<button class="x" data-act="tag-del" data-tag="${esc(t)}" aria-label="Remove tag ${esc(t)}">×</button></span>`).join('')}</div>
-      <form data-form="tag" class="row"><input name="tag" placeholder="New tag" autocomplete="off"><button>Add tag</button></form>
+    <section class="card"><h3>Tags</h3>
+      <div class="chips wrap">${s.tags.map((t) => `<span class="chip">${esc(t)}<button type="button" class="tag-x" data-act="tag-del" data-tag="${esc(t)}" aria-label="Remove tag ${esc(t)}">×</button></span>`).join('')}
+        <input class="chip-input" data-newtag="settings" placeholder="+ New tag" enterkeyhint="done"></div>
     </section>
-    <section class="card"><h2>Sync across devices (GitHub)</h2>
-      <p class="small">Without sync, changes stay in this browser only. With sync, every change is saved to <code>data.json</code> in your GitHub repo,
-        so your phone and laptop see the same thing. The token is stored only in this browser — never in the repo.</p>
-      <ol class="small">
-        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → Fine-grained token → Generate new token</a>.</li>
+    <section class="card"><h3>Sync across devices</h3>
+      <p class="small muted" style="margin-top:0">Without sync, changes stay in this browser. With sync, every change is saved to <code>data.json</code> in your GitHub repo, so phone and laptop match. The token stays in this browser only.</p>
+      <ol class="steps">
+        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → new fine-grained token</a>.</li>
         <li>Repository access: <b>Only select repositories</b> → <code>${esc(g.repo)}</code>.</li>
-        <li>Permissions → Repository permissions → <b>Contents: Read and write</b>. Generate, copy, paste below.</li>
-        <li>Do this once on each device (you can reuse the same token).</li>
+        <li>Permissions → Repository → <b>Contents: Read and write</b>. Generate, copy, paste below.</li>
+        <li>Do this once on each device.</li>
       </ol>
-      <div class="grid2">
-        <label>Owner<input id="syOwner" value="${esc(g.owner)}" autocomplete="off"></label>
-        <label>Repo<input id="syRepo" value="${esc(g.repo)}" autocomplete="off"></label>
-        <label>Branch (empty = default)<input id="syBranch" value="${esc(g.branch || '')}" autocomplete="off"></label>
-        <label>File<input id="syPath" value="${esc(g.path || 'data.json')}" autocomplete="off"></label>
-      </div>
-      <label>Token<input id="syToken" type="password" placeholder="github_pat_…" value="${esc((sync && sync.token) || '')}" autocomplete="off"></label>
-      <div class="row"><button class="primary" data-act="sync-save">Save & sync now</button>${syncOn() ? '<button data-act="sync-off">Disconnect this device</button>' : ''}</div>
+      <label><span class="field-label">Token</span><input class="boxed" id="syToken" type="password" placeholder="github_pat_…" value="${esc((sync && sync.token) || '')}" autocomplete="off"></label>
+      <details style="margin-top:10px"><summary class="small muted" style="cursor:pointer">Repository details</summary>
+        <div class="grid2" style="margin-top:8px">
+          <label><span class="field-label">Owner</span><input class="boxed" id="syOwner" value="${esc(g.owner)}"></label>
+          <label><span class="field-label">Repo</span><input class="boxed" id="syRepo" value="${esc(g.repo)}"></label>
+          <label><span class="field-label">Branch (empty = default)</span><input class="boxed" id="syBranch" value="${esc(g.branch || '')}"></label>
+          <label><span class="field-label">File</span><input class="boxed" id="syPath" value="${esc(g.path || 'data.json')}"></label>
+        </div></details>
+      <div class="actions"><button type="button" class="btn primary" data-act="sync-save">Save & sync now</button>${syncOn() ? '<button type="button" class="btn" data-act="sync-off">Disconnect this device</button>' : ''}</div>
       <p class="small muted" id="syncMsg">${syncOn() ? 'Connected.' : 'Not connected — saving on this device only.'}</p>
     </section>
-    <section class="card"><h2>Backup</h2>
-      <div class="row"><button data-act="export">Download backup (.json)</button>
-        <label class="btn" style="margin:0">Import backup<input type="file" accept="application/json,.json" id="importFile" hidden></label></div>
+    <section class="card"><h3>Backup</h3>
+      <div class="actions" style="margin-top:0"><button type="button" class="btn" data-act="export">Download backup</button>
+        <label class="btn">Import backup<input type="file" accept="application/json,.json" id="importFile" hidden></label></div>
     </section>
-    <section class="card"><h2>Tame X itself</h2>
-      <ul class="small">
-        <li>Create a <b>private X List</b> with only your trusted people. Pin it. It’s chronological and only shows them. Save its link above.</li>
-        <li>On X, use your pinned List or the <b>Following</b> tab — never <b>For You</b>.</li>
-        <li><b>Bookmarks:</b> move the ones still worth it here (Library → Bulk add), then clear your X bookmarks. A bookmark means “decide later”; here means “decided”.</li>
-        <li>After someone’s trial, <b>unfollow or mute</b> anyone you dropped. Aim for: who you follow ≈ your Trusted list.</li>
-        <li>Move the X app off your home screen. Put <b>My Real X</b> there instead (browser Share → “Add to Home Screen”).</li>
-        <li>Turn off X push notifications except DMs.</li>
-        <li>On Android, after adding to home screen you can <b>Share → My Real X</b> from any app to save a link.</li>
+    <section class="card"><h3>Tame X itself</h3>
+      <ul class="small muted" style="padding-left:18px;margin:0">
+        <li>Make a <b>private X List</b> of your trusted people, pin it, and paste its link above.</li>
+        <li>On X, use that List or <b>Following</b> — never <b>For You</b>.</li>
+        <li>Move good bookmarks here (+ → Many links at once), then clear your X bookmarks.</li>
+        <li>Unfollow or mute anyone you dropped after a trial.</li>
+        <li>Swap the X app on your home screen for My Real X (browser Share → Add to Home Screen).</li>
+        <li>On Android, after installing: Share → My Real X from any app.</li>
       </ul>
-    </section>`;
+    </section></div>`;
 }
 
 function render() {
@@ -650,192 +674,129 @@ function render() {
   main.innerHTML = fn();
   if (view === 'library') renderLibList();
   if (view === 'people') renderPeopleList();
-  loadTwitter(main);
   renderTimer();
 }
-function goView(v) { view = v; window.scrollTo(0, 0); render(); }
-function isEditing() {
+function goView(v) { view = v; libLimit = LIB_PAGE; window.scrollTo(0, 0); render(); }
+function isBusy() {
   const a = document.activeElement;
-  return ($('#dlg') && $('#dlg').open) || (a && a.matches && a.matches('.i-title, .i-body, input, textarea'));
+  return $('#sheet').open || (a && a.matches && a.matches('input, textarea'));
 }
 
-/* ---------- ideas ---------- */
-function newIdea(fields, open = true) {
-  const idea = { id: uid(), added: nowIso(), status: 'idea', title: '', body: '', tags: [], days: [], ...fields };
-  upsert('ideas', idea);
-  if (open) {
-    openIdea = idea.id;
-    goView('create');
-    setTimeout(() => { const b = $('.idea.open .i-body'); if (b) b.focus(); }, 0);
-  }
-  return idea;
+/* ---------- sheets ---------- */
+let sheetCtx = null;
+function openSheet(html, { forest = false, ctx = null } = {}) {
+  const d = $('#sheet');
+  if (sheetCtx && sheetCtx.dirty) { clearTimeout(fieldSaveT); const r = sheetRec(); if (r) upsert(sheetCtx.table, r); }
+  sheetCtx = ctx;
+  d.className = forest ? 'forest-sheet' : '';
+  $('#sheetBody').innerHTML = `<div class="grabber"></div><div class="sheet-top"><button type="button" class="close" data-act="sheet-close" aria-label="Close">${icon('close')}</button></div>${html}`;
+  if (!d.open) d.showModal();
+  d.scrollTop = 0;
+  loadTwitter($('#sheetBody'));
 }
-function newIdeaFromItem(it) {
-  newIdea({ title: `My take on: ${itemTitle(it)}`, body: it.takeaway ? `${it.takeaway}\n\n` : '', sourceId: it.id, tags: (it.tags || []).slice() });
-}
-let ideaSaveT = null;
-function onIdeaInput(t) {
-  const card = t.closest('[data-card]');
-  const rec = byId('ideas', card.dataset.card);
-  if (!rec) return;
-  rec.title = $('.i-title', card).value;
-  rec.body = $('.i-body', card).value;
-  addDay(rec);
-  if (rec.status === 'idea' && rec.body.trim()) {
-    rec.status = 'draft';
-    const b = $('.badge', card); b.textContent = 'draft'; b.className = 'badge s-draft';
-  }
-  $('.count', card).textContent = `${rec.body.length} chars`;
-  $('[data-role=intent]', card).href = intentUrl(rec);
-  clearTimeout(ideaSaveT);
-  ideaSaveT = setTimeout(() => upsert('ideas', rec), 700);
-}
+function closeSheet() { const d = $('#sheet'); if (d.open) d.close(); }
 
-/* ---------- add / edit dialog ---------- */
-let dlgCtx = null;
-const dlgActions = (withDelete) => `<div class="actions end">${withDelete ? '<button class="danger" data-dlg="delete" style="margin-right:auto">Delete</button>' : ''}
-  <button data-dlg="cancel">Cancel</button><button class="primary" data-dlg="save">Save</button></div>`;
-function openAdd(url = '', kind = null) {
-  dlgCtx = { mode: 'add', forcedKind: kind, initial: {} };
-  $('#dlgBody').innerHTML = `<h2>${kind === 'creator' ? 'Add a person' : 'Add'}</h2>
-    <label>Link<input name="url" type="url" placeholder="Paste a link: X post, X profile, YouTube, blog…" value="${esc(url)}" autocomplete="off"></label>
-    <div id="addFields"></div>${dlgActions(false)}`;
-  updateAddFields(true);
-  $('#dlg').showModal();
-  if (!url) $('#dlg [name=url]').focus();
+/* capture: one box for everything */
+function openCapture(prefill = '') {
+  openSheet(`
+    <h2 class="display">What did you find today?</h2>
+    <div class="capture-box"><textarea class="plain" id="capIn" rows="2" placeholder="Paste a link, or write a thought" enterkeyhint="done">${esc(prefill)}</textarea></div>
+    <p class="hint" id="capHint"></p>
+    <div id="capSave"></div>
+    <div class="choice-grid" id="capChoices">
+      <button type="button" class="choice tilt-l" data-act="cap-paste">${icon('clipboard')}<span>Paste from clipboard</span></button>
+      <button type="button" class="choice dark tilt-r" data-act="cap-bulk">${icon('layers')}<span>Many links at once</span></button>
+    </div>`, { forest: true, ctx: { kind: 'capture' } });
+  updateCapture();
+  if (!prefill) setTimeout(() => { const t = $('#capIn'); if (t) t.focus(); }, 60);
 }
-function openEdit(kind, id) {
+function detect(text) {
+  const v = text.trim();
+  if (!v) return null;
+  const m = v.match(/^https?:\/\/\S+$/);
+  if (!m) return { kind: 'idea', hint: 'A thought — it will be saved as an idea in Create.' };
+  const p = parseUrl(v);
+  if (!p) return { kind: 'idea', hint: 'A thought — it will be saved as an idea in Create.' };
+  if (p.kind === 'creator') return { kind: 'creator', p, hint: `A person on ${p.platform === 'x' ? 'X' : 'YouTube'} — they’ll start on a ${TRIAL_DAYS}-day trial.` };
+  const existing = findItemByUrl(p.url);
+  if (existing) return { kind: 'item', p, existing, hint: 'Already in your collection — saving opens it.' };
+  const what = p.type === 'x' ? `An X post${p.handle ? ` by @${p.handle}` : ''}` : p.type === 'youtube' ? 'A YouTube video' : `A link from ${hostOf(p.url)}`;
+  return { kind: 'item', p, hint: `${what} — it goes to Today’s reading.` };
+}
+function updateCapture() {
+  const t = $('#capIn');
+  if (!t) return;
+  const d = detect(t.value);
+  $('#capHint').textContent = d ? d.hint : 'One box for everything. It works out what you pasted.';
+  $('#capSave').innerHTML = d ? `<button type="button" class="btn light big block" data-act="cap-save" style="margin-top:14px">${icon('check')}Save</button>` : '';
+  $('#capChoices').style.display = d ? 'none' : '';
+  t.style.height = 'auto'; t.style.height = `${t.scrollHeight}px`;
+}
+function captureSave() {
+  const text = $('#capIn').value.trim();
+  const d = detect(text);
+  if (!d) return;
+  if (d.kind === 'idea') {
+    const lines = text.split('\n');
+    const body = lines.length > 1 || lines[0].length > 120 ? text : '';
+    const idea = newIdea({ title: lines[0].slice(0, 120), body, status: body ? 'draft' : 'idea', days: [today()] });
+    showSaved('ideas', idea.id);
+    return;
+  }
+  if (d.kind === 'creator') {
+    let c = findCreator(d.p.platform, d.p.handle);
+    if (!c) { c = { id: uid(), added: nowIso(), name: '', handle: d.p.handle, platform: d.p.platform, url: d.p.url, status: 'trial', note: '', foundVia: '', tags: [] }; upsert('creators', c); }
+    showSaved('creators', c.id);
+    return;
+  }
+  if (d.existing) { openItem(d.existing.id); return; }
+  const it = { id: uid(), added: nowIso(), status: 'unread', url: d.p.url, type: d.p.type, handle: d.p.handle || '', videoId: d.p.videoId || '', title: '', note: '', tags: [] };
+  upsert('items', it);
+  showSaved('items', it.id);
+}
+function showSaved(kind, id) {
   const rec = byId(kind, id);
-  if (!rec) return;
-  dlgCtx = { mode: 'edit', kindTable: kind, id, forcedKind: kind === 'creators' ? 'creator' : 'item', initial: { ...rec, tags: rec.tags || [] } };
-  $('#dlgBody').innerHTML = `<h2>Edit</h2>
-    <label>Link<input name="url" type="url" value="${esc(rec.url)}" autocomplete="off"></label>
-    <div id="addFields"></div>${dlgActions(true)}`;
-  updateAddFields(true);
-  $('#dlg').showModal();
+  let preview = '';
+  let extra = '';
+  if (kind === 'items') {
+    preview = tileCard(rec).replace(' data-open', '');
+    const c = rec.handle ? findCreator('x', rec.handle) : null;
+    extra = `<span class="field-label">Where should it go?</span>
+      <div class="seg">${[['unread', 'Read it in Today'], ['reference', 'Just keep it']].map(([v, l]) => `<button type="button" data-act="set-status" data-scope="cap" data-status="${v}" aria-pressed="${rec.status === v}">${l}</button>`).join('')}</div>
+      ${rec.handle && !c ? `<div class="chips" style="margin-top:14px"><button type="button" class="chip" data-act="follow-author" aria-pressed="false">Follow @${esc(rec.handle)} on trial</button></div>` : ''}`;
+  } else if (kind === 'creators') {
+    preview = personCard(rec).replace(' data-open', '');
+    extra = `<span class="field-label">Trust</span><div class="seg">${[['trial', `On trial (${TRIAL_DAYS} days)`], ['trusted', 'Trusted']].map(([v, l]) => `<button type="button" data-act="set-status" data-scope="cap" data-status="${v}" aria-pressed="${rec.status === v}">${l}</button>`).join('')}</div>`;
+  } else {
+    preview = ideaCard(rec).replace(' data-open', '');
+  }
+  openSheet(`
+    <h2 class="display">Saved.</h2>
+    <div class="saved-card">${preview}</div>
+    ${extra}
+    <span class="field-label">Tags (optional)</span>
+    ${tagChips(rec.tags || [], 'cap')}
+    <div class="actions" style="margin-top:26px">
+      <button type="button" class="btn light big" data-act="sheet-close">Done</button>
+      ${kind === 'ideas' ? `<button type="button" class="btn ghost-light big" data-act="open-idea" data-id="${id}">Keep writing</button>` : ''}
+      <button type="button" class="btn ghost-light big" data-act="cap-again">Add another</button>
+    </div>`, { forest: true, ctx: { kind: 'saved', table: kind, id } });
 }
 function openBulk() {
-  dlgCtx = { mode: 'bulk' };
-  $('#dlgBody').innerHTML = `<h2>Bulk add</h2>
-    <p class="small">Paste many links at once — one per line, or any text that contains links. Great for cleaning up X bookmarks:
-      copy the links of bookmarks still worth it, paste them here, then clear your bookmarks on X. Profile links become people on trial.</p>
-    <textarea name="bulk" rows="9" placeholder="https://x.com/someone/status/123…&#10;https://www.youtube.com/watch?v=…"></textarea>
-    ${tagPicker([])}${dlgActions(false)}`;
-  $('#dlg').showModal();
+  openSheet(`
+    <h2 class="display">Many links at once.</h2>
+    <p class="hint">Paste anything that contains links — your old X bookmarks, a note, a list. Profile links become people on trial; everything else goes to your collection.</p>
+    <div class="capture-box"><textarea class="plain" id="bulkIn" rows="7" placeholder="https://x.com/…&#10;https://youtube.com/…"></textarea></div>
+    <button type="button" class="btn light big block" data-act="bulk-save" style="margin-top:16px">Save all</button>`, { forest: true, ctx: { kind: 'bulk' } });
+  setTimeout(() => { const t = $('#bulkIn'); if (t) t.focus(); }, 60);
 }
-function readForm() {
-  const d = $('#dlg');
-  const val = (n) => { const el = d.querySelector(`[name="${n}"]`); return el ? el.value : ''; };
-  const tags = $$('[name=tag]:checked', d).map((x) => x.value);
-  const extra = val('newTags').split(',').map((s) => s.trim()).filter(Boolean);
-  return {
-    url: val('url').trim(), title: val('title'), note: val('note'), name: val('name'), handle: val('handle'),
-    platform: val('platform'), status: val('status'), foundVia: val('foundVia'), bulk: val('bulk'),
-    addCreator: !!d.querySelector('[name=addCreator]:checked'), tags: [...new Set([...tags, ...extra])],
-  };
-}
-function detectedLine(p, kind) {
-  if (kind === 'creator') return `<p class="small muted">Person on ${platformLabel(p.platform)}${p.handle ? ` · @${esc(p.handle)}` : ''}</p>`;
-  if (p.type === 'x') return `<p class="small muted">𝕏 post${p.handle ? ` by @${esc(p.handle)}` : ''} — will show embedded</p>`;
-  if (p.type === 'youtube') return '<p class="small muted">▶️ YouTube video — will play right here</p>';
-  return `<p class="small muted">📄 ${p.platform === 'x' ? 'X article' : 'Web page'} · ${esc(hostOf(p.url))}</p>`;
-}
-function fieldsHtml(kind, v, p) {
-  if (kind === 'creator') {
-    return `<div class="grid2">
-        <label>Name<input name="name" value="${esc(v.name)}" placeholder="Their name"></label>
-        <label>Handle<input name="handle" value="${esc(v.handle)}" placeholder="optional"></label>
-        <label>Where<select name="platform">${opts([['x', '𝕏'], ['youtube', 'YouTube'], ['web', 'Blog / website']], v.platform)}</select></label>
-        <label>Status<select name="status">${opts([['trial', `On trial (${TRIAL_DAYS} days)`], ['trusted', 'Trusted']], v.status)}</select></label>
-      </div>
-      <label>Why do I follow them?<textarea name="note" rows="2" placeholder="What do they help me make or think better?">${esc(v.note)}</textarea></label>
-      <label>Found via<input name="foundVia" value="${esc(v.foundVia)}" placeholder="e.g. @someone’s article, a podcast…"></label>
-      ${tagPicker(v.tags)}`;
-  }
-  const showAddCreator = dlgCtx.mode === 'add' && p && p.handle && !findCreator(p.platform, p.handle);
-  return `<label>Title (optional)<input name="title" value="${esc(v.title)}" placeholder="Short name so you can find it later"></label>
-    <label>Why is this worth my time?<textarea name="note" rows="2" placeholder="What do I want to learn or make from it?">${esc(v.note)}</textarea></label>
-    ${tagPicker(v.tags)}
-    ${showAddCreator ? `<label class="check"><input type="checkbox" name="addCreator">Also add @${esc(p.handle)} to People (on trial)</label>` : ''}`;
-}
-function updateAddFields(force = false) {
-  const box = $('#addFields');
-  if (!box) return;
-  const raw = $('#dlg [name=url]').value.trim();
-  const p = parseUrl(raw);
-  const kind = dlgCtx.forcedKind || (p ? p.kind : 'item');
-  const sig = `${kind}|${p ? p.url : ''}`;
-  if (!force && sig === dlgCtx.sig) return;
-  const urlChanged = (p ? p.url : '') !== dlgCtx.lastUrl;
-  dlgCtx.sig = sig;
-  dlgCtx.lastUrl = p ? p.url : '';
-  dlgCtx.kind = kind;
-  const cur = box.children.length ? readForm() : dlgCtx.initial;
-  const v = {
-    title: cur.title || '', note: cur.note || '', tags: cur.tags || [], name: cur.name || dlgCtx.authorName || '',
-    handle: (p && p.handle) || cur.handle || '', platform: (p && p.platform) || cur.platform || 'web',
-    status: cur.status || 'trial', foundVia: cur.foundVia || '',
-  };
-  let dup = '';
-  if (dlgCtx.mode === 'add' && p) {
-    const existing = kind === 'creator' ? findCreator(p.platform, p.handle) : findItemByUrl(p.url);
-    if (existing) dup = '<p class="warn small">Already saved — saving will update it.</p>';
-  }
-  box.innerHTML = (dlgCtx.mode === 'add' ? `<div class="seg">
-      <label><input type="radio" name="kind" value="item" ${kind === 'item' ? 'checked' : ''}>Save to Library</label>
-      <label><input type="radio" name="kind" value="creator" ${kind === 'creator' ? 'checked' : ''}>Add a person</label></div>` : '') +
-    (p ? detectedLine(p, kind) : raw ? '<p class="warn small">That doesn’t look like a link yet.</p>' : '') + dup + fieldsHtml(kind, v, p);
-  if (urlChanged && p && dlgCtx.mode === 'add' && (p.type === 'youtube' || p.type === 'x')) {
-    const want = p.url;
-    fetchMeta(want).then((m) => {
-      if (!m || !dlgCtx || dlgCtx.lastUrl !== want || !$('#dlg').open) return;
-      dlgCtx.authorName = m.author_name || '';
-      const ti = $('#dlg [name=title]');
-      if (ti && !ti.value && p.type === 'youtube' && m.title) ti.value = m.title;
-      const nm = $('#dlg [name=name]');
-      if (nm && !nm.value && m.author_name) nm.value = m.author_name;
-    });
-  }
-}
-function creatorUrl(p) {
-  if (p.kind === 'creator') return p.url;
-  if (p.platform === 'x' && p.handle) return `https://x.com/${p.handle}`;
-  return p.url;
-}
-function saveDialog() {
-  const f = readForm();
-  if (dlgCtx.mode === 'bulk') return saveBulk(f);
-  const p = parseUrl(f.url);
-  if (!p) { toast('Please paste a valid http(s) link'); return; }
-  ensureTags(f.tags);
-  if (dlgCtx.kind === 'creator') {
-    const handle = f.handle.trim().replace(/^@/, '');
-    let rec = dlgCtx.id ? byId('creators', dlgCtx.id) : findCreator(f.platform, handle);
-    if (!rec) rec = { id: uid(), added: nowIso() };
-    if (rec.status === 'trusted' && f.status === 'trial') rec.trialStart = nowIso();
-    Object.assign(rec, { name: f.name.trim(), handle, platform: f.platform || 'web', url: creatorUrl(p), note: f.note.trim(), status: f.status || 'trial', foundVia: f.foundVia.trim(), tags: f.tags });
-    upsert('creators', rec);
-  } else {
-    let rec = dlgCtx.id ? byId('items', dlgCtx.id) : findItemByUrl(p.url);
-    if (!rec) rec = { id: uid(), added: nowIso(), status: 'unread' };
-    Object.assign(rec, { url: p.url, type: p.type || 'web', handle: p.handle || '', videoId: p.videoId || '', title: f.title.trim(), note: f.note.trim(), tags: f.tags });
-    upsert('items', rec);
-    if (f.addCreator && p.handle && !findCreator(p.platform, p.handle)) {
-      upsert('creators', { id: uid(), added: nowIso(), name: dlgCtx.authorName || '', handle: p.handle, platform: p.platform, url: creatorUrl(p), status: 'trial', note: '', foundVia: `post: ${p.url}`, tags: f.tags.slice() });
-    }
-  }
-  $('#dlg').close();
-  render();
-  toast('Saved');
-}
-function saveBulk(f) {
-  const urls = [...new Set(f.bulk.match(/https?:\/\/[^\s<>"')\]]+/g) || [])];
+function saveBulk() {
+  const urls = [...new Set($('#bulkIn').value.match(/https?:\/\/[^\s<>"')\]]+/g) || [])];
   let items = 0; let people = 0; let dup = 0;
-  ensureTags(f.tags);
   for (const u of urls) {
     const p = parseUrl(u);
     if (!p) continue;
-    const base = { id: uid(), added: nowIso(), updated: nowIso(), tags: f.tags.slice() };
+    const base = { id: uid(), added: nowIso(), updated: nowIso(), tags: [] };
     if (p.kind === 'creator') {
       if (findCreator(p.platform, p.handle)) { dup++; continue; }
       db.creators.push({ ...base, name: '', handle: p.handle, platform: p.platform, url: p.url, status: 'trial', note: '', foundVia: 'bulk add' });
@@ -847,43 +808,129 @@ function saveBulk(f) {
     }
   }
   save();
-  $('#dlg').close();
+  closeSheet();
+  toast(`Saved ${plural(items, 'link')}, ${plural(people, 'person', 'people')}${dup ? ` · ${dup} already saved` : ''}`);
+  if (items) { filters.lib = { q: '', status: '', tag: '__none' }; goView('library'); }
+}
+
+/* detail sheets: edit in place, no forms */
+function openItem(id) {
+  const it = byId('items', id);
+  if (!it) return;
+  const media = embedHtml(it);
+  openSheet(`
+    ${media ? `<div class="sheet-media">${media}</div>` : ''}
+    <textarea class="plain title" data-field="title" rows="1" placeholder="${esc(itemTitle(it))}">${esc(it.title || '')}</textarea>
+    <p class="src" style="margin-top:8px">${typeIcon(it)}<span>${esc(sourceLine(it))}</span> · <a href="${esc(safeHref(it.url))}" target="_blank" rel="noopener">Open original</a></p>
+    ${it.type === 'x' && it.text && !media.includes('twitter-tweet') ? `<p class="post-text">${esc(it.text)}</p>` : ''}
+    <textarea class="plain note" data-field="note" rows="2" placeholder="Why is this worth your time? (optional)">${esc(it.note || '')}</textarea>
+    ${it.takeaway || it.status === 'read' ? `<span class="field-label">My takeaway</span><textarea class="boxed serif" data-field="takeaway" rows="2" placeholder="One line you’ll use or make from this" style="font-size:18px">${esc(it.takeaway || '')}</textarea>` : ''}
+    <span class="field-label">Status</span>
+    <div class="seg">${[['unread', 'To read'], ['reference', 'Reference'], ['read', 'Read'], ['archived', 'Dropped']].map(([v, l]) => `<button type="button" data-act="set-status" data-scope="item" data-status="${v}" aria-pressed="${it.status === v}">${l}</button>`).join('')}</div>
+    <span class="field-label">Tags</span>
+    ${tagChips(it.tags || [], 'item')}
+    <div class="actions" style="margin-top:26px">
+      <button type="button" class="btn primary" data-act="make-idea">${icon('pen')}Make from this</button>
+      <button type="button" class="btn danger" data-act="delete">${icon('trash')}Delete</button>
+    </div>`, { ctx: { kind: 'item', table: 'items', id } });
+  autoGrow();
+}
+function openPerson(id) {
+  const c = byId('creators', id);
+  if (!c) return;
+  const saved = c.handle ? live('items').filter((i) => (i.handle || '').toLowerCase() === c.handle.toLowerCase()) : [];
+  openSheet(`
+    <div class="person" style="padding:0;text-align:left">${avatarHtml(c)}</div>
+    <textarea class="plain title" data-field="name" rows="1" placeholder="${esc(c.handle ? `@${c.handle}` : 'Name')}">${esc(c.name || '')}</textarea>
+    <p class="src" style="margin-top:6px"><span>${c.handle ? `@${esc(c.handle)} · ` : ''}${c.platform === 'x' ? 'X' : c.platform === 'youtube' ? 'YouTube' : esc(hostOf(c.url))}</span></p>
+    <textarea class="plain note" data-field="note" rows="2" placeholder="Why do I follow them? (optional)">${esc(c.note || '')}</textarea>
+    <div class="actions"><a class="btn primary big" href="${esc(safeHref(c.url))}" target="_blank" rel="noopener">${icon('open')}Visit</a></div>
+    <span class="field-label">Trust</span>
+    <div class="seg">${[['trial', `On trial · day ${Math.min(daysSince(c.trialStart || c.added) + 1, TRIAL_DAYS)} of ${TRIAL_DAYS}`], ['trusted', 'Trusted']].map(([v, l]) => `<button type="button" data-act="set-status" data-scope="person" data-status="${v}" aria-pressed="${c.status === v}">${l}</button>`).join('')}</div>
+    <span class="field-label">Tags</span>
+    ${tagChips(c.tags || [], 'person')}
+    <span class="field-label">Found via</span>
+    <input class="boxed" data-field="foundVia" value="${esc(c.foundVia || '')}" placeholder="Someone’s post, a podcast…">
+    ${saved.length ? `<span class="field-label">Saved from them</span>${saved.map(rowCard).join('')}` : ''}
+    <div class="actions" style="margin-top:26px"><button type="button" class="btn danger" data-act="delete">${icon('trash')}Drop this person</button></div>`,
+  { ctx: { kind: 'person', table: 'creators', id } });
+  autoGrow();
+}
+function openIdeaSheet(id) {
+  const i = byId('ideas', id);
+  if (!i) return;
+  const src = i.sourceId ? byId('items', i.sourceId) : null;
+  openSheet(`
+    <textarea class="plain title" data-field="title" rows="1" placeholder="Title or hook">${esc(i.title || '')}</textarea>
+    ${src ? `<p class="src" style="margin-top:8px"><span>From <a href="#" data-act="open-item" data-id="${src.id}">${esc(itemTitle(src))}</a></span></p>` : ''}
+    <textarea class="plain body" data-field="body" style="margin-top:16px" placeholder="Write freely. Done is better than perfect.">${esc(i.body || '')}</textarea>
+    <p class="tiny muted" id="charCount">${(i.body || '').length} characters</p>
+    <div class="actions">
+      <a class="btn primary" target="_blank" rel="noopener" id="intentLink" href="${esc(intentUrl(i))}">${icon('send')}Post on X</a>
+      <button type="button" class="btn soft" data-act="copy">${icon('copy')}Copy</button>
+      ${i.status !== 'published' ? `<button type="button" class="btn" data-act="publish">${icon('check')}Mark published</button>`
+        : `${i.publishedUrl ? `<a class="btn" target="_blank" rel="noopener" href="${esc(safeHref(i.publishedUrl))}">${icon('open')}View post</a>` : ''}<button type="button" class="btn" data-act="unpublish">${icon('undo')}Back to draft</button>`}
+      <button type="button" class="btn danger" data-act="delete">${icon('trash')}Delete</button>
+    </div>`, { ctx: { kind: 'idea', table: 'ideas', id } });
+  autoGrow();
+}
+function autoGrow() {
+  $$('#sheetBody textarea.title, #sheetBody textarea.note').forEach((t) => { t.style.height = 'auto'; t.style.height = `${t.scrollHeight}px`; });
+}
+
+/* ---------- ideas ---------- */
+function newIdea(fields) {
+  const idea = { id: uid(), added: nowIso(), status: 'idea', title: '', body: '', tags: [], days: [], ...fields };
+  upsert('ideas', idea);
+  return idea;
+}
+function writeIdea(fields) {
+  const idea = newIdea(fields);
+  view = 'create';
   render();
-  toast(`Added ${items} item(s), ${people} person(s)${dup ? `, skipped ${dup} duplicate(s)` : ''}`);
+  openIdeaSheet(idea.id);
+  setTimeout(() => { const b = $('#sheetBody [data-field=body]'); if (b) b.focus(); }, 80);
+}
+function newIdeaFromItem(it) {
+  writeIdea({ title: `My take on: ${itemTitle(it)}`, body: it.takeaway ? `${it.takeaway}\n\n` : '', sourceId: it.id, tags: (it.tags || []).slice() });
+}
+function takeawayForm(it) {
+  return `<textarea class="boxed serif" rows="2" placeholder="One line: what will you use or make from this?" style="font-size:18px">${esc(it.takeaway || '')}</textarea>
+    <div class="actions" style="margin-top:10px"><button type="button" class="btn primary" data-act="done-save">Save</button>
+      <button type="button" class="btn soft" data-act="done-idea">Save and make something</button><button type="button" class="btn quiet" data-act="done-cancel">Cancel</button></div>`;
 }
 
 /* ---------- events ---------- */
+let fieldSaveT = null;
+function sheetRec() { return sheetCtx && sheetCtx.table ? byId(sheetCtx.table, sheetCtx.id) : null; }
+
 function onClick(e) {
-  const d = e.target.closest('[data-dlg]');
-  if (d) {
-    e.preventDefault();
-    if (d.dataset.dlg === 'save') saveDialog();
-    else if (d.dataset.dlg === 'delete') {
-      if (confirm('Delete this for good?')) { removeRec(dlgCtx.kindTable, dlgCtx.id); $('#dlg').close(); render(); }
-    } else $('#dlg').close();
-    return;
-  }
-  const a = e.target.closest('[data-act]');
+  const a = e.target.closest('[data-act], [data-open]');
   if (!a) return;
-  if (a.tagName === 'A') e.preventDefault();
+  const act = a.dataset.act || 'open';
+  if (a.tagName === 'A' && (a.getAttribute('href') === '#' || act === 'goto')) e.preventDefault();
   const card = a.closest('[data-card]');
+  const inSheet = !!a.closest('#sheet');
   const id = card ? card.dataset.card : null;
   const kind = card ? card.dataset.kind : null;
-  const rec = id ? byId(kind, id) : null;
-  switch (a.dataset.act) {
-    case 'goto': goView(a.dataset.view); break;
-    case 'open-add': openAdd('', a.dataset.kind || null); break;
-    case 'bulk': openBulk(); break;
-    case 'toggle':
-      if (kind === 'ideas') {
-        openIdea = openIdea === id ? null : id;
-        render();
-        if (openIdea) { const b = $('.idea.open .i-body'); if (b) b.focus(); }
-      } else {
-        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
-        refreshCard(kind, id);
-      }
+  const rec = inSheet && !card ? sheetRec() : id ? byId(kind, id) : null;
+  const table = inSheet && !card ? sheetCtx && sheetCtx.table : kind;
+
+  switch (act) {
+    case 'goto': closeSheet(); goView(a.dataset.view); break;
+    case 'open':
+      if (!rec) break;
+      if (table === 'items') openItem(rec.id); else if (table === 'ideas') openIdeaSheet(rec.id); else if (table === 'creators') openPerson(rec.id);
       break;
+    case 'open-item': openItem(a.dataset.id); break;
+    case 'open-idea': openIdeaSheet(a.dataset.id); break;
+    case 'sheet-close': closeSheet(); break;
+    case 'filter': {
+      filters[a.dataset.group][a.dataset.key] = a.dataset.val;
+      libLimit = LIB_PAGE;
+      render();
+      break;
+    }
     case 'done': {
       const slot = $('.slot', card);
       slot.innerHTML = takeawayForm(rec);
@@ -898,67 +945,93 @@ function onClick(e) {
       rec.readAt = nowIso();
       if (tk) rec.takeaway = tk;
       upsert('items', rec);
-      if (a.dataset.act === 'done-idea') newIdeaFromItem(rec);
-      else { refreshCard(kind, id); toast(tk ? 'Takeaway saved 💡' : 'Marked as read'); }
+      if (act === 'done-idea') newIdeaFromItem(rec);
+      else { render(); toast(tk ? 'Takeaway saved' : 'Marked as read'); }
       break;
     }
-    case 'make-idea': newIdeaFromItem(rec); break;
-    case 'keep': rec.status = 'reference'; upsert('items', rec); refreshCard(kind, id); toast('Kept as reference — out of your daily queue'); break;
-    case 'archive': rec.status = 'archived'; upsert('items', rec); refreshCard(kind, id); toast('Dropped — less noise'); break;
-    case 'unread': rec.status = 'unread'; delete rec.readAt; upsert('items', rec); refreshCard(kind, id); break;
-    case 'edit': openEdit(kind, id); break;
-    case 'promote': rec.status = 'trusted'; upsert('creators', rec); renderPeopleList(); toast('Kept as trusted'); break;
-    case 'demote': rec.status = 'trial'; rec.trialStart = nowIso(); upsert('creators', rec); renderPeopleList(); break;
-    case 'drop-creator':
-      if (confirm(`Drop ${rec.name || '@' + rec.handle}? Their saved posts stay in your Library. (Remember to unfollow on X too.)`)) {
-        removeRec('creators', id); renderPeopleList();
-      }
+    case 'make-idea': if (rec) newIdeaFromItem(rec); break;
+    case 'set-status': {
+      if (!rec) break;
+      const st = a.dataset.status;
+      if (table === 'creators' && rec.status === 'trusted' && st === 'trial') rec.trialStart = nowIso();
+      rec.status = st;
+      if (table === 'items') { if (st === 'read' && !rec.readAt) rec.readAt = nowIso(); if (st === 'unread') delete rec.readAt; }
+      upsert(table, rec);
+      $$('[data-act=set-status]', a.parentElement).forEach((b) => b.setAttribute('aria-pressed', String(b === a)));
       break;
-    case 'del-idea':
-      if (confirm('Delete this idea?')) { removeRec('ideas', id); openIdea = null; render(); }
+    }
+    case 'tag-toggle': {
+      if (!rec) break;
+      const t = a.dataset.tag;
+      rec.tags = rec.tags || [];
+      rec.tags = rec.tags.includes(t) ? rec.tags.filter((x) => x !== t) : [...rec.tags, t];
+      upsert(table, rec);
+      a.setAttribute('aria-pressed', String(rec.tags.includes(t)));
       break;
+    }
+    case 'follow-author': {
+      if (!rec || findCreator('x', rec.handle)) break;
+      upsert('creators', { id: uid(), added: nowIso(), name: rec.author || '', handle: rec.handle, platform: 'x', url: `https://x.com/${rec.handle}`, status: 'trial', note: '', foundVia: `post: ${rec.url}`, tags: (rec.tags || []).slice() });
+      a.setAttribute('aria-pressed', 'true');
+      a.textContent = `Following @${rec.handle} on trial`;
+      break;
+    }
+    case 'delete': {
+      if (!rec) break;
+      const what = table === 'creators' ? 'Drop this person? Their saved posts stay in your collection. (Unfollow them on X too.)' : 'Delete this for good?';
+      if (confirm(what)) { removeRec(table, rec.id); closeSheet(); toast(table === 'creators' ? 'Dropped' : 'Deleted'); }
+      break;
+    }
     case 'publish': {
-      const u = prompt('Nice! 🎉 Paste the link to your published post (optional):', '');
+      const u = prompt('Nice! Paste the link to your published post (optional):', '');
       if (u === null) break;
       rec.status = 'published';
       rec.publishedAt = nowIso();
       if (/^https?:\/\//.test(u.trim())) rec.publishedUrl = u.trim();
       addDay(rec);
       upsert('ideas', rec);
-      render();
-      toast('Published! That counts. 🔥');
+      openIdeaSheet(rec.id);
+      toast('Published. That counts.');
       break;
     }
-    case 'unpublish': rec.status = 'draft'; upsert('ideas', rec); render(); break;
+    case 'unpublish': rec.status = 'draft'; upsert('ideas', rec); openIdeaSheet(rec.id); break;
     case 'copy':
       if (navigator.clipboard) navigator.clipboard.writeText(rec.body || rec.title || '').then(() => toast('Copied'), () => toast('Copy failed'));
       break;
-    case 'close-idea': openIdea = null; render(); break;
-    case 'draft-from-prompt': newIdea({ title: currentPrompt() }); break;
+    case 'draft-from-prompt': writeIdea({ title: currentPrompt() }); break;
     case 'another-prompt': promptShift++; render(); break;
     case 'more-lib': libLimit += LIB_PAGE; renderLibList(); break;
-    case 'bonus': usage.bonus += 5; store(LS.usage, usage); render(); toast('5 more minutes. Make them count.'); break;
+    case 'bonus': usage.bonus += 5; store(LS.usage, usage); render(); toast('Five more minutes. Make them count.'); break;
+    case 'cap-paste':
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        navigator.clipboard.readText().then((t) => { $('#capIn').value = t; updateCapture(); }, () => { $('#capIn').focus(); toast('Long-press the box and choose Paste'); });
+      } else { $('#capIn').focus(); toast('Long-press the box and choose Paste'); }
+      break;
+    case 'cap-save': captureSave(); break;
+    case 'cap-bulk': openBulk(); break;
+    case 'cap-again': openCapture(); break;
+    case 'bulk-save': saveBulk(); break;
     case 'settings-save': {
       const list = $('#setList').value.trim();
-      if (list && !/^https?:\/\//.test(list)) { toast('X List link must start with https://'); break; }
+      if (list && !/^https?:\/\//.test(list)) { toast('The X List link must start with https://'); break; }
       setSettings({
         dailyMinutes: Math.max(0, Math.min(240, parseInt($('#setMin').value, 10) || 0)),
         todayCount: Math.max(1, Math.min(50, parseInt($('#setCount').value, 10) || 5)),
         xListUrl: list,
       });
       renderTimer();
-      toast('Settings saved');
+      toast('Saved');
       break;
     }
     case 'tag-del': {
       const t = a.dataset.tag;
-      if (confirm(`Remove tag “${t}” from the tag list? (Items keep it.)`)) { setSettings({ tags: db.settings.tags.filter((x) => x !== t) }); render(); }
+      if (confirm(`Remove “${t}” from your tag list? Things already tagged keep it.`)) { setSettings({ tags: db.settings.tags.filter((x) => x !== t) }); render(); }
       break;
     }
     case 'sync-save': {
       const token = $('#syToken').value.trim();
       const cfg = { owner: $('#syOwner').value.trim(), repo: $('#syRepo').value.trim(), branch: $('#syBranch').value.trim(), path: $('#syPath').value.trim() || 'data.json', token };
-      if (!token || !cfg.owner || !cfg.repo) { toast('Owner, repo and token are needed'); break; }
+      if (!token || !cfg.owner || !cfg.repo) { toast('Paste your token first'); break; }
       sync = cfg;
       store(LS.sync, sync);
       remoteSha = null;
@@ -967,7 +1040,7 @@ function onClick(e) {
       break;
     }
     case 'sync-off':
-      if (confirm('Disconnect this device from GitHub sync? (Your data stays here and in GitHub.)')) {
+      if (confirm('Disconnect this device from sync? Your data stays here and on GitHub.')) {
         sync = null; forget(LS.sync); remoteSha = null; setSync('local'); render();
       }
       break;
@@ -988,15 +1061,55 @@ function onInput(e) {
   if (t.matches('[data-filter]')) {
     const [group, key] = t.dataset.filter.split('.');
     filters[group][key] = t.value;
-    if (group === 'lib') { libLimit = LIB_PAGE; renderLibList(); } else renderPeopleList();
+    libLimit = LIB_PAGE;
+    if (group === 'lib') renderLibList(); else renderPeopleList();
     return;
   }
-  if (t.matches('#dlg [name=url]')) { updateAddFields(); return; }
-  if (t.matches('.i-title, .i-body')) onIdeaInput(t);
+  if (t.id === 'capIn') { updateCapture(); return; }
+  if (t.matches('#sheetBody [data-field]')) {
+    const rec = sheetRec();
+    if (!rec) return;
+    rec[t.dataset.field] = t.value;
+    if (sheetCtx.table === 'ideas') {
+      addDay(rec);
+      if (rec.status === 'idea' && (rec.body || '').trim()) rec.status = 'draft';
+      const cc = $('#charCount'); if (cc) cc.textContent = `${(rec.body || '').length} characters`;
+      const il = $('#intentLink'); if (il) il.href = intentUrl(rec);
+    }
+    if (t.matches('textarea.title, textarea.note')) { t.style.height = 'auto'; t.style.height = `${t.scrollHeight}px`; }
+    sheetCtx.dirty = true;
+    const table = sheetCtx.table;
+    clearTimeout(fieldSaveT);
+    fieldSaveT = setTimeout(() => { upsert(table, rec); if (sheetCtx && sheetCtx.id === rec.id) sheetCtx.dirty = false; }, 600);
+  }
+}
+function addNewTag(input) {
+  const tag = input.value.trim().replace(/,/g, '');
+  if (!tag) return;
+  ensureTags([tag]);
+  const scope = input.dataset.newtag;
+  if (scope === 'settings') { render(); return; }
+  const rec = sheetRec();
+  if (rec) {
+    rec.tags = [...new Set([...(rec.tags || []), tag])];
+    upsert(sheetCtx.table, rec);
+    const chip = document.createElement('button');
+    chip.type = 'button'; chip.className = 'chip'; chip.dataset.act = 'tag-toggle'; chip.dataset.scope = scope; chip.dataset.tag = tag;
+    chip.setAttribute('aria-pressed', 'true'); chip.textContent = tag;
+    input.before(chip);
+  }
+  input.value = '';
+}
+function onKeydown(e) {
+  if (e.key === 'Enter' && e.target.matches('[data-newtag]')) { e.preventDefault(); addNewTag(e.target); }
+  if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'capIn') {
+    const v = e.target.value.trim();
+    if (/^https?:\/\/\S+$/.test(v)) { e.preventDefault(); captureSave(); }
+  }
 }
 function onChange(e) {
   const t = e.target;
-  if (t.matches('#dlg [name=kind]')) { dlgCtx.forcedKind = t.value; updateAddFields(true); return; }
+  if (t.matches('[data-newtag]')) { addNewTag(t); return; }
   if (t.id === 'importFile' && t.files[0]) {
     t.files[0].text().then((txt) => {
       db = mergeDb(db, normalize(JSON.parse(txt)));
@@ -1012,12 +1125,9 @@ function onSubmit(e) {
   const text = input.value.trim();
   if (!text) return;
   if (f.dataset.form === 'quick') {
-    newIdea({ title: text, days: [today()] }, false);
+    newIdea({ title: text, days: [today()] });
     render();
-    toast('Idea captured ✍️');
-  } else if (f.dataset.form === 'tag') {
-    ensureTags([text]);
-    render();
+    toast('Idea saved');
   }
 }
 function handleIncomingShare() {
@@ -1026,11 +1136,17 @@ function handleIncomingShare() {
   if (!raw) return;
   history.replaceState(null, '', location.pathname);
   const m = raw.match(/https?:\/\/[^\s<>"']+/);
-  if (m) openAdd(m[0]);
+  openCapture(m ? m[0] : raw);
 }
 
 /* ---------- start ---------- */
 async function init() {
+  // icons in static chrome
+  $('#gear').innerHTML = icon('settings');
+  $('#addBtn').innerHTML = icon('plus');
+  const tabs = { today: ['today', 'Today'], library: ['collect', 'Collection'], create: ['pen', 'Create'], people: ['people', 'People'] };
+  $$('#nav [data-view]').forEach((b) => { const [ic, label] = tabs[b.dataset.view]; b.innerHTML = `${icon(ic)}<span>${label}</span>`; });
+
   let base = null;
   try {
     const r = await fetch(`data.json?t=${Date.now()}`, { cache: 'no-store' });
@@ -1042,11 +1158,21 @@ async function init() {
   setSync(syncOn() ? 'saving' : 'local');
 
   $('#nav').addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (b) goView(b.dataset.view); });
-  $('#addBtn').addEventListener('click', () => openAdd());
+  $('#addBtn').addEventListener('click', () => openCapture());
   $('#sync').addEventListener('click', () => goView('settings'));
+  const sheet = $('#sheet');
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) closeSheet(); });
+  sheet.addEventListener('close', () => {
+    const rec = sheetRec();
+    if (rec && sheetCtx.dirty) { clearTimeout(fieldSaveT); upsert(sheetCtx.table, rec); }
+    sheetCtx = null;
+    $('#sheetBody').innerHTML = '';
+    render();
+  });
   document.addEventListener('click', onClick);
   document.addEventListener('input', onInput);
   document.addEventListener('change', onChange);
+  document.addEventListener('keydown', onKeydown);
   document.addEventListener('submit', onSubmit);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && syncOn() && Date.now() - lastPull > 60000) pullRemote();

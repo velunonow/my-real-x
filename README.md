@@ -1,47 +1,36 @@
 # My Real X
 
-My own calm version of X: **only the people and posts I chose — then go make something.**
+My own calm collection: **only the people and posts I chose — then go make something.**
+A small static web app on GitHub Pages. No X API, no server, no feed.
 
-No X API, no server, no feed. A small static website hosted on GitHub Pages that works on phone and laptop.
+Live: https://velunonow.github.io/my-real-x/
 
-## Why
+## What's inside
 
-| Problem | Fix in this app |
+| Tab | What it does |
 |---|---|
-| X bookmarks are a mess | **Library**: every saved item has a *reason* ("why is this worth my time?") and tags. Bulk-add to clean up old bookmarks, then clear them on X. |
-| I follow too many people I don't really like | **People**: trusted list + a 14-day **trial** for new people. Keep or drop. Link a private **X List** that shows only them. |
-| Too much time on "For You" | **Today**: only N items a day + a daily reading timer. When time is up: "done for today — go create". |
-| I want to create, not only consume | **Create**: ideas → drafts → published, a daily prompt, a making streak, "Post on X" button. Every finished read asks for a one-line takeaway or "turn into idea". |
+| **Today** | 5 things to read and a 15-minute daily limit. Then: "That's enough reading for today." Every read can become a takeaway or an idea. |
+| **Collection** | Everything you kept, as a two-column wall of cards with photos. Filter by To read / Reference / Read, and by tag. |
+| **+** | One box for everything: paste a link (post, video, article, profile) or write a thought. It works out the rest. |
+| **Create** | Ideas, drafts and published posts. A daily prompt, a making streak, "Post on X". |
+| **People** | Trusted people and newcomers on a 14-day trial. Visit on purpose; keep or drop. |
 
-## How to use
+## Design
 
-- **Add anything:** tap **+ Add** and paste a link.
-  - X post → shown embedded. X profile → a person. YouTube video → plays inline. Any other link → article/blog.
-  - Saving a post from someone new? Tick *"Also add to People (on trial)"*.
-- **Daily loop (≈15 min):** open **Today** → read your 5 → tap **✓ Done** → write a one-line takeaway → **Save + turn into idea** → write in **Create**.
-- **Weekly (Sunday, 20 min):** People → check trials (keep or drop), discover new people through the ones you trust.
-- **Phone:** open the site → browser Share → **Add to Home Screen**. On Android you can then *Share → My Real X* from any app.
-- **Shortcut link:** `https://<you>.github.io/my-real-x/?add=<link>` opens the Add dialog pre-filled (handy for iOS Shortcuts).
+- [`PRODUCT.md`](PRODUCT.md) explains who the app is for and why.
+- [`DESIGN.md`](DESIGN.md) has the exact look (colours, type, spacing, components) in the [DESIGN.md format](https://github.com/google-labs-code/design.md).
+- [`.claude/skills/my-taste/`](.claude/skills/my-taste/SKILL.md) is my portable design taste. Copy this folder into another project's `.claude/skills/` (or into `~/.claude/skills/` for every project), and Claude designs the way I like there too.
+
+## Link previews
+
+[`.github/workflows/previews.yml`](.github/workflows/previews.yml) runs whenever `data.json` changes. It fetches preview images, titles, X post text and profile photos for new links, then commits them back. It needs no API keys: web pages are read for their preview tags, and X posts come from the public FxTwitter API. YouTube and GitHub previews are built by the app itself.
+
+If the job can't push, go to repo Settings → Actions → General → Workflow permissions and choose **Read and write**.
 
 ## Sync across devices
 
-By default, changes are saved in the browser only. To sync phone + laptop:
-
-1. GitHub → Settings → Developer settings → **Fine-grained token** → Generate new token.
-2. Repository access: **Only select repositories** → `my-real-x`.
-3. Permissions → Repository → **Contents: Read and write**.
-4. In the app: ⚙︎ → *Sync across devices* → paste the token → **Save & sync now**. Do this once per device.
-
-Every change is then committed to `data.json` in this repo. The token never leaves your browser except to talk to GitHub.
-Note: the repo is public, so your lists and drafts are public too.
-
-## Publish on GitHub Pages
-
-Repo → **Settings → Pages** → *Build and deployment* → Source: **Deploy from a branch** → pick the branch that has these files, folder **/ (root)** → Save.
-After a minute the site is live at `https://velunonow.github.io/my-real-x/`.
+Changes are saved in the browser by default. To sync phone and laptop: Settings → Sync → paste a fine-grained GitHub token (this repo only, **Contents: Read and write**). Every change is then committed to `data.json`. The repo is public, so the collection is public too.
 
 ## Files
 
-- `index.html`, `style.css`, `app.js` — the whole app (plain HTML/CSS/JS, no build step).
-- `data.json` — your people, library and ideas.
-- `manifest.webmanifest`, `sw.js`, icons — "Add to Home Screen" + offline support.
+`index.html`, `style.css`, `app.js` hold the whole app (no build step). `data.json` is the data. `manifest.webmanifest` and `sw.js` provide Add to Home Screen and offline use. `design/taste.html` is the taste quiz.
