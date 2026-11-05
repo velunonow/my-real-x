@@ -36,7 +36,7 @@
     {
       "id": "mw2z7nirglgkx",
       "added": "2026-11-05T03:18:40.851Z",
-      "name": "",
+      "name": "Thariq",
       "handle": "trq212",
       "platform": "x",
       "url": "https://x.com/trq212",
@@ -44,7 +44,10 @@
       "note": "",
       "foundVia": "post: https://x.com/trq212/status/2052809885763747935",
       "tags": [],
-      "updated": "2026-11-05T03:18:40.851Z"
+      "updated": "2026-11-05T06:53:08.510Z",
+      "avatar": "https://pbs.twimg.com/profile_images/1976939058741039104/r3GgzqRh_400x400.jpg",
+      "bio": "playing WoW forever, formerly Claude Code @anthropicai",
+      "enriched": "2026-11-05T06:53:08.510Z"
     }
   ],
   "items": [
@@ -241,14 +244,18 @@
       "type": "x",
       "handle": "trq212",
       "videoId": "",
-      "title": "",
+      "title": "Using Claude Code: The Unreasonable Effectiveness of HTML",
       "note": "",
       "tags": [
         "Design",
         "AI",
         "Learning"
       ],
-      "updated": "2026-11-05T03:35:11.459Z"
+      "updated": "2026-11-05T06:53:08.510Z",
+      "text": "This is now also on the Claude Blog.\n\nMarkdown has become the dominant file format used by agents to communicate with us. It’s simple, portable, has some rich text capability and is easy for you to",
+      "author": "Thariq",
+      "image": "https://pbs.twimg.com/media/HHz_ftzaIAAwkQs.jpg",
+      "enriched": "2026-11-05T06:53:08.510Z"
     }
   ],
   "ideas": [
