@@ -40,11 +40,13 @@
       "handle": "trq212",
       "platform": "x",
       "url": "https://x.com/trq212",
-      "status": "trial",
+      "status": "trusted",
       "note": "",
       "foundVia": "post: https://x.com/trq212/status/2052809885763747935",
-      "tags": [],
-      "updated": "2026-11-05T06:53:08.510Z",
+      "tags": [
+        "AI"
+      ],
+      "updated": "2026-11-05T06:56:37.657Z",
       "avatar": "https://pbs.twimg.com/profile_images/1976939058741039104/r3GgzqRh_400x400.jpg",
       "bio": "playing WoW forever, formerly Claude Code @anthropicai",
       "enriched": "2026-11-05T06:53:08.510Z"
