@@ -16,7 +16,7 @@
   "creators": [
     {
       "id": "seed-cenanigel",
-      "name": "",
+      "name": "孔令涛",
       "handle": "CenaNigel",
       "platform": "x",
       "url": "https://x.com/CenaNigel",
@@ -28,7 +28,10 @@
         "Business"
       ],
       "added": "2026-11-04T00:00:00.000Z",
-      "updated": "2026-11-04T00:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "avatar": "https://pbs.twimg.com/profile_images/2097694789676437504/kRuXyupP_400x400.jpg",
+      "bio": "AI商业讲师｜AI培训与咨询创业公司老板｜培训机构教研总监｜互联网牛马全栈｜量化交易稳定归零专家｜opc践行者｜官方AI与FDE证书合作｜商业合作+V：doubleQklt",
+      "enriched": "2026-11-05T03:14:03.568Z"
     }
   ],
   "items": [
@@ -38,7 +41,7 @@
       "type": "x",
       "handle": "CenaNigel",
       "videoId": "",
-      "title": "",
+      "title": "万字长文｜去企业讲半天就敢说自己做企业培训了？我从程序员到全职商业 AI 讲师这一路",
       "note": "Read it again and write down one idea I can use.",
       "tags": [
         "AI",
@@ -46,7 +49,11 @@
       ],
       "status": "unread",
       "added": "2026-11-04T00:00:00.000Z",
-      "updated": "2026-11-05T03:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "text": "万字长文，一文说清楚我是从程序员转型成为Ai讲师的 https://t.co/z8XZYMGl3k",
+      "author": "孔令涛",
+      "image": "https://pbs.twimg.com/media/HWQWRIFboAAsoTi.jpg",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-1",
@@ -61,7 +68,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-2",
@@ -76,7 +84,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-3",
@@ -91,7 +100,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-4",
@@ -106,7 +116,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-5",
@@ -121,7 +132,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-6",
@@ -136,7 +148,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-7",
@@ -151,7 +164,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-8",
@@ -166,7 +180,11 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "site": "Apple Developer",
+      "desc": "Find documentation and resources for designing great apps for Apple platforms.",
+      "image": "https://developer.apple.com/news/images/og/design-og.jpg?2",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-9",
@@ -181,7 +199,8 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "enriched": "2026-11-05T03:14:03.568Z"
     },
     {
       "id": "design-10",
@@ -196,7 +215,10 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-04T15:00:00.000Z"
+      "updated": "2026-11-05T03:14:03.568Z",
+      "text": "10 github repos that turn claude code and codex into elite ui designers:\n\n 1.⁠ ⁠Superdesign Skill\n    https://t.co/WcBesRprR8\n 2.⁠ ⁠Better Design\n    https://t.co/MY3r3DRGfI\n 3.⁠ ⁠Design Taste\n    https://t.co/hIEh7IbLhk\n 4.⁠ ⁠Canvas UI\n    https://t.co/XBn2ccH6cg\n 5.⁠ ⁠Paper Shaders\n    https://t.co/IvDIhx2omg\n 6.⁠ ⁠UI Layouts\n    https://t.co/VJl3MnXpHf\n 7.⁠ ⁠Hyperiux Components\n    https://t.co/Vr2nmb2MIp\n 8.⁠ ⁠Motion Primitives\n    https://t.co/cgSZr64XuZ\n 9.⁠ ⁠Cursify\n    https://t.co/nnu6qdKUlZ\n10.⁠ ⁠Trickle UI Kit\n    https://t.co/iqzMeNktmp",
+      "author": "0xMarioNawfal",
+      "enriched": "2026-11-05T03:14:03.568Z"
     }
   ],
   "ideas": [
