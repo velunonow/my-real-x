@@ -32,6 +32,19 @@
       "avatar": "https://pbs.twimg.com/profile_images/2097694789676437504/kRuXyupP_400x400.jpg",
       "bio": "AI商业讲师｜AI培训与咨询创业公司老板｜培训机构教研总监｜互联网牛马全栈｜量化交易稳定归零专家｜opc践行者｜官方AI与FDE证书合作｜商业合作+V：doubleQklt",
       "enriched": "2026-11-05T03:14:03.568Z"
+    },
+    {
+      "id": "mw2z7nirglgkx",
+      "added": "2026-11-05T03:18:40.851Z",
+      "name": "",
+      "handle": "trq212",
+      "platform": "x",
+      "url": "https://x.com/trq212",
+      "status": "trial",
+      "note": "",
+      "foundVia": "post: https://x.com/trq212/status/2052809885763747935",
+      "tags": [],
+      "updated": "2026-11-05T03:18:40.851Z"
     }
   ],
   "items": [
@@ -219,6 +232,23 @@
       "text": "10 github repos that turn claude code and codex into elite ui designers:\n\n 1.⁠ ⁠Superdesign Skill\n    https://t.co/WcBesRprR8\n 2.⁠ ⁠Better Design\n    https://t.co/MY3r3DRGfI\n 3.⁠ ⁠Design Taste\n    https://t.co/hIEh7IbLhk\n 4.⁠ ⁠Canvas UI\n    https://t.co/XBn2ccH6cg\n 5.⁠ ⁠Paper Shaders\n    https://t.co/IvDIhx2omg\n 6.⁠ ⁠UI Layouts\n    https://t.co/VJl3MnXpHf\n 7.⁠ ⁠Hyperiux Components\n    https://t.co/Vr2nmb2MIp\n 8.⁠ ⁠Motion Primitives\n    https://t.co/cgSZr64XuZ\n 9.⁠ ⁠Cursify\n    https://t.co/nnu6qdKUlZ\n10.⁠ ⁠Trickle UI Kit",
       "author": "0xMarioNawfal",
       "enriched": "2026-11-05T03:14:03.568Z"
+    },
+    {
+      "id": "mw2z7idlguwt2",
+      "added": "2026-11-05T03:18:34.185Z",
+      "status": "unread",
+      "url": "https://x.com/trq212/status/2052809885763747935",
+      "type": "x",
+      "handle": "trq212",
+      "videoId": "",
+      "title": "",
+      "note": "",
+      "tags": [
+        "Design",
+        "AI",
+        "Learning"
+      ],
+      "updated": "2026-11-05T03:35:11.459Z"
     }
   ],
   "ideas": [
@@ -235,6 +265,16 @@
       "days": [],
       "added": "2026-11-04T00:00:00.000Z",
       "updated": "2026-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "mw2z5iw0kjz9w",
+      "added": "2026-11-05T03:17:01.536Z",
+      "status": "idea",
+      "title": "Answer a question someone asked you recently, publicly.",
+      "body": "",
+      "tags": [],
+      "days": [],
+      "updated": "2026-11-05T03:17:01.536Z"
     }
   ]
 }
