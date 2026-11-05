@@ -405,13 +405,15 @@ function syncTipHtml() {
 }
 
 /* ---------- cards ---------- */
-function tileCard(it) {
+function tileCard(it, even = false) {
   const img = itemImage(it);
   const quote = it.type === 'x' && it.text && !img && !it.title;
+  // Even grid: every card gets the same picture area (a placeholder when there is no photo).
+  const pic = even ? (quote ? '' : `<div class="ph">${img ? imgTag(img) : typeIcon(it) || icon('link')}</div>`) : imgTag(img);
   const flag = view === 'today' ? (it.status === 'read' ? '<span class="flag muted">Read</span>' : '')
     : it.status === 'unread' ? '<span class="flag">To read</span>' : it.status === 'archived' ? '<span class="flag muted">Dropped</span>' : '';
   return `<article class="card tile ${quote ? 'quote' : ''}" data-card="${it.id}" data-kind="items" data-open>
-    ${imgTag(img)}
+    ${pic}
     <div class="tile-body">
       ${quote ? `<p class="q">${esc(clip(it.text, 320))}</p>` : `<h3 class="t">${esc(itemTitle(it))}</h3>`}
       <p class="src">${typeIcon(it)}<span>${esc(sourceLine(it))}</span></p>
@@ -474,7 +476,7 @@ function renderToday() {
     if (!todays.length) html += `<div class="card empty"><p class="display-s">Nothing waiting.</p>Tap <b>+</b> to save a post, article or video. Or visit one of your people on purpose.</div>`;
   }
   const cards = [...todays, ...readToday];
-  if (cards.length) html += `<div class="masonry" style="margin-top:${todays.length ? 0 : 18}px">${cards.map(tileCard).join('')}</div>`;
+  if (cards.length) html += `<div class="even" style="margin-top:${todays.length ? 0 : 18}px">${cards.map((c) => tileCard(c, true)).join('')}</div>`;
   return html;
 }
 

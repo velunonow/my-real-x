@@ -144,8 +144,8 @@ A quiet, light room full of physical cards — and one deep forest green that sh
 
 - Phone first, 16px gutter, content max 760px.
 - **One card = one thing.** Never a card inside a card.
-- Today and the capture flow: one column, one thing at a time.
-- Collection, Create and People: a **two-column masonry** of mixed card types.
+- Today: an **even grid** (2 columns on phones, 3 on wide screens). Every card has the same picture shape (1.91:1, a soft forest placeholder when there is no photo), titles stop at 3 lines, and cards in a row share one height. A short daily list should look calm and orderly.
+- Collection, Create and People: a **two-column masonry** where each card is as tall as its content, for browsing a big collection like a wall of paper.
 - Navigation: a floating bottom tab bar with the forest **+** in the middle.
 
 ## Elevation & Depth
