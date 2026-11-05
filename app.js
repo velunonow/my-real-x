@@ -6,7 +6,7 @@
  */
 
 const DEFAULT_TAGS = ['AI', 'Business', 'Learning', 'Writing'];
-const LS = { data: 'mrx.data.v1', sync: 'mrx.sync.v1', usage: 'mrx.usage.v1' };
+const LS = { data: 'mrx.data.v1', sync: 'mrx.sync.v1', syncTip: 'mrx.syncTip.v1' };
 const TRIAL_DAYS = 14;
 const TRUSTED_SOFT_MAX = 30;
 const LIB_PAGE = 40;
@@ -258,40 +258,6 @@ function guessSync() {
   return { owner: 'velunonow', repo: 'my-real-x', branch: '', path: 'data.json' };
 }
 
-/* ---------- daily reading timer ---------- */
-let usage = loadUsage();
-function loadUsage() {
-  const u = load(LS.usage);
-  return u && u.date === today() ? u : { date: today(), sec: 0, bonus: 0 };
-}
-function limitSec() {
-  const m = Number(db.settings.dailyMinutes) || 0;
-  return m > 0 ? (m + usage.bonus) * 60 : Infinity;
-}
-const locked = () => usage.sec >= limitSec();
-function tick() {
-  if (usage.date !== today()) { usage = { date: today(), sec: 0, bonus: 0 }; store(LS.usage, usage); }
-  const gated = view === 'today' || view === 'library';
-  if (gated && document.visibilityState === 'visible' && !locked()) {
-    usage.sec++;
-    if (usage.sec % 5 === 0) store(LS.usage, usage);
-    if (locked()) { store(LS.usage, usage); if (!isBusy()) render(); }
-  }
-  renderTimer();
-}
-function minutesLeft() {
-  const lim = limitSec();
-  return lim === Infinity ? null : Math.max(0, Math.ceil((lim - usage.sec) / 60));
-}
-function renderTimer() {
-  const el = $('#timer');
-  const lim = limitSec();
-  if (lim === Infinity) { el.textContent = ''; return; }
-  if (locked()) { el.textContent = 'Reading done'; return; }
-  const left = lim - usage.sec;
-  el.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')} left`;
-}
-
 /* ---------- making stats ---------- */
 function makingStreak() {
   const s = new Set();
@@ -422,38 +388,28 @@ function tagChips(selected, scope) {
   return `<div class="chips wrap">${allTags().map((t) => `<button type="button" class="chip" data-act="tag-toggle" data-scope="${scope}" data-tag="${esc(t)}" aria-pressed="${selected.includes(t)}">${esc(t)}</button>`).join('')}
     <input class="chip-input" data-newtag="${scope}" placeholder="+ New tag" enterkeyhint="done" autocomplete="off"></div>`;
 }
-function lockedHtml() {
+function doneMomentHtml() {
   return `<section class="field-moment">
-    <h2 class="display">That’s enough reading for today.</h2>
-    <p>You chose ${plural(Number(db.settings.dailyMinutes), 'minute')}. Everything will still be here tomorrow. Now use what you learned.</p>
+    <h2 class="display">That’s today’s reading.</h2>
+    <p>The rest can wait until tomorrow. Now use what you read.</p>
     <div class="choice-grid">
       <button type="button" class="choice tilt-l" data-act="goto" data-view="create">${icon('pen')}<span>Make something</span></button>
-      <button type="button" class="choice dark tilt-r" data-act="bonus">${icon('clock')}<span>5 more minutes</span></button>
+      <button type="button" class="choice dark tilt-r" data-act="open-capture">${icon('plus')}<span>Write down a thought</span></button>
     </div></section>`;
+}
+function syncTipHtml() {
+  if (syncOn() || load(LS.syncTip)) return '';
+  return `<div class="card pad small muted" style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">
+    <span style="flex:1">Saved on this device only. <a href="#" data-act="goto" data-view="settings">Turn on sync</a> so your phone and laptop match, and new links get their photos.</span>
+    <button type="button" class="close" style="width:30px;height:30px;background:var(--sunk)" data-act="hide-sync-tip" aria-label="Hide">${icon('close')}</button></div>`;
 }
 
 /* ---------- cards ---------- */
-function featureCard(it) {
-  const img = itemImage(it);
-  const text = it.type === 'x' && it.text;
-  return `<article class="card" data-card="${it.id}" data-kind="items">
-    ${img ? `<div data-open>${imgTag(img)}</div>` : ''}
-    <div class="pad">
-      <p class="src">${typeIcon(it)}<span>${esc(sourceLine(it))}</span></p>
-      <div data-open>${it.title || !text ? `<h3 class="title">${esc(itemTitle(it))}</h3>` : ''}${text ? `<p class="post-text">${esc(clip(it.text, 500))}</p>` : ''}</div>
-      ${it.note ? `<p class="note">${esc(it.note)}</p>` : ''}
-      <div class="actions">
-        <button type="button" class="btn primary" data-act="done">${icon('check')}Done</button>
-        <button type="button" class="btn soft" data-act="open">Read</button>
-        <button type="button" class="btn quiet" data-act="make-idea">${icon('pen')}Make from this</button>
-      </div>
-      <div class="slot"></div>
-    </div></article>`;
-}
 function tileCard(it) {
   const img = itemImage(it);
   const quote = it.type === 'x' && it.text && !img && !it.title;
-  const flag = it.status === 'unread' ? '<span class="flag">To read</span>' : it.status === 'archived' ? '<span class="flag muted">Dropped</span>' : '';
+  const flag = view === 'today' ? (it.status === 'read' ? '<span class="flag muted">Read</span>' : '')
+    : it.status === 'unread' ? '<span class="flag">To read</span>' : it.status === 'archived' ? '<span class="flag muted">Dropped</span>' : '';
   return `<article class="card tile ${quote ? 'quote' : ''}" data-card="${it.id}" data-kind="items" data-open>
     ${imgTag(img)}
     <div class="tile-body">
@@ -498,11 +454,11 @@ function renderToday() {
   const unread = items.filter((i) => i.status === 'unread').sort((a, b) => (a.added || '').localeCompare(b.added || ''));
   const todays = unread.slice(0, Math.max(0, s.todayCount - readToday.length));
   const wk = weekStats();
-  const left = minutesLeft();
   let html = `<section class="page-head">
       <h1 class="display">${greeting()}</h1>
-      <p class="sub">${readToday.length} of ${s.todayCount} read today${left !== null && !locked() ? ` · ${plural(left, 'minute')} of reading left` : ''}</p>
+      <p class="sub">${todays.length ? `${readToday.length} of ${s.todayCount} read today. Tap a card to read it.` : readToday.length ? 'All read for today.' : 'Nothing to read yet.'}</p>
     </section>
+    ${syncTipHtml()}
     <section class="card forest pad">
       ${streakHtml()}
       <p class="display-s" style="margin-top:14px">${esc(currentPrompt())}</p>
@@ -512,20 +468,17 @@ function renderToday() {
       </div>
       <p class="tiny" style="margin:16px 0 0">Last 7 days: read ${wk.read} · made ${wk.made} · published ${wk.pub}${wk.read > wk.made * 2 + 1 ? '. You’re reading more than making — make one thing next.' : ''}</p>
     </section>`;
-  if (locked()) return html + lockedHtml();
-  html += `<h2 class="section">Today’s reading<span class="count">${readToday.length}/${s.todayCount}</span></h2>`;
-  if (!todays.length && readToday.length >= s.todayCount) {
-    html += `<div class="card empty"><p class="display-s">That’s today’s reading.</p>The rest can wait until tomorrow. Go make something.</div>`;
-  } else if (!todays.length) {
-    html += `<div class="card empty"><p class="display-s">Nothing waiting.</p>Tap <b>+</b> to save a post, article or video. Or visit one of your people on purpose.</div>`;
+  if (!todays.length && readToday.length >= s.todayCount) html += doneMomentHtml();
+  else {
+    html += `<h2 class="section">Today’s reading<span class="count">${readToday.length}/${s.todayCount}</span></h2>`;
+    if (!todays.length) html += `<div class="card empty"><p class="display-s">Nothing waiting.</p>Tap <b>+</b> to save a post, article or video. Or visit one of your people on purpose.</div>`;
   }
-  html += todays.map(featureCard).join('');
-  if (readToday.length) html += `<h2 class="section">Read today<span class="count">${readToday.length}</span></h2>${readToday.map(rowCard).join('')}`;
+  const cards = [...todays, ...readToday];
+  if (cards.length) html += `<div class="masonry" style="margin-top:${todays.length ? 0 : 18}px">${cards.map(tileCard).join('')}</div>`;
   return html;
 }
 
 function renderLibrary() {
-  if (locked()) return `<section class="page-head"><h1 class="display">Collection</h1></section>${lockedHtml()}`;
   const f = filters.lib;
   const items = live('items');
   const count = (st) => items.filter((i) => i.status === st).length;
@@ -621,10 +574,7 @@ function renderSettings() {
   return `<section class="page-head"><h1 class="display">Settings</h1></section>
     <div class="settings">
     <section class="card"><h3>Habits</h3>
-      <div class="grid2">
-        <label><span class="field-label" style="margin-top:0">Daily reading minutes (0 = no limit)</span><input class="boxed" type="number" min="0" max="240" id="setMin" value="${esc(s.dailyMinutes)}" inputmode="numeric"></label>
-        <label><span class="field-label" style="margin-top:0">Things to read per day</span><input class="boxed" type="number" min="1" max="50" id="setCount" value="${esc(s.todayCount)}" inputmode="numeric"></label>
-      </div>
+      <label><span class="field-label" style="margin-top:0">Things to read per day</span><input class="boxed" type="number" min="1" max="50" id="setCount" value="${esc(s.todayCount)}" inputmode="numeric" style="max-width:160px"></label>
       <label><span class="field-label">My X List link (optional)</span><input class="boxed" type="url" id="setList" placeholder="https://x.com/i/lists/…" value="${esc(s.xListUrl)}"></label>
       <div class="actions"><button type="button" class="btn primary" data-act="settings-save">Save</button></div>
     </section>
@@ -674,7 +624,6 @@ function render() {
   main.innerHTML = fn();
   if (view === 'library') renderLibList();
   if (view === 'people') renderPeopleList();
-  renderTimer();
 }
 function goView(v) { view = v; libLimit = LIB_PAGE; window.scrollTo(0, 0); render(); }
 function isBusy() {
@@ -750,7 +699,7 @@ function captureSave() {
     showSaved('creators', c.id);
     return;
   }
-  if (d.existing) { openItem(d.existing.id); return; }
+  if (d.existing) { openItem(d.existing.id, { markRead: false }); return; }
   const it = { id: uid(), added: nowIso(), status: 'unread', url: d.p.url, type: d.p.type, handle: d.p.handle || '', videoId: d.p.videoId || '', title: '', note: '', tags: [] };
   upsert('items', it);
   showSaved('items', it.id);
@@ -815,9 +764,10 @@ function saveBulk() {
 }
 
 /* detail sheets: edit in place, no forms */
-function openItem(id) {
+function openItem(id, { markRead = true } = {}) {
   const it = byId('items', id);
   if (!it) return;
+  if (markRead && it.status === 'unread') { it.status = 'read'; it.readAt = nowIso(); upsert('items', it); }
   const media = embedHtml(it);
   openSheet(`
     ${media ? `<div class="sheet-media">${media}</div>` : ''}
@@ -895,12 +845,6 @@ function writeIdea(fields) {
 function newIdeaFromItem(it) {
   writeIdea({ title: `My take on: ${itemTitle(it)}`, body: it.takeaway ? `${it.takeaway}\n\n` : '', sourceId: it.id, tags: (it.tags || []).slice() });
 }
-function takeawayForm(it) {
-  return `<textarea class="boxed serif" rows="2" placeholder="One line: what will you use or make from this?" style="font-size:18px">${esc(it.takeaway || '')}</textarea>
-    <div class="actions" style="margin-top:10px"><button type="button" class="btn primary" data-act="done-save">Save</button>
-      <button type="button" class="btn soft" data-act="done-idea">Save and make something</button><button type="button" class="btn quiet" data-act="done-cancel">Cancel</button></div>`;
-}
-
 /* ---------- events ---------- */
 let fieldSaveT = null;
 function sheetRec() { return sheetCtx && sheetCtx.table ? byId(sheetCtx.table, sheetCtx.id) : null; }
@@ -930,24 +874,6 @@ function onClick(e) {
       filters[a.dataset.group][a.dataset.key] = a.dataset.val;
       libLimit = LIB_PAGE;
       render();
-      break;
-    }
-    case 'done': {
-      const slot = $('.slot', card);
-      slot.innerHTML = takeawayForm(rec);
-      $('textarea', slot).focus();
-      break;
-    }
-    case 'done-cancel': $('.slot', card).innerHTML = ''; break;
-    case 'done-save':
-    case 'done-idea': {
-      const tk = $('.slot textarea', card).value.trim();
-      rec.status = 'read';
-      rec.readAt = nowIso();
-      if (tk) rec.takeaway = tk;
-      upsert('items', rec);
-      if (act === 'done-idea') newIdeaFromItem(rec);
-      else { render(); toast(tk ? 'Takeaway saved' : 'Marked as read'); }
       break;
     }
     case 'make-idea': if (rec) newIdeaFromItem(rec); break;
@@ -1002,7 +928,8 @@ function onClick(e) {
     case 'draft-from-prompt': writeIdea({ title: currentPrompt() }); break;
     case 'another-prompt': promptShift++; render(); break;
     case 'more-lib': libLimit += LIB_PAGE; renderLibList(); break;
-    case 'bonus': usage.bonus += 5; store(LS.usage, usage); render(); toast('Five more minutes. Make them count.'); break;
+    case 'open-capture': openCapture(); break;
+    case 'hide-sync-tip': store(LS.syncTip, 1); render(); break;
     case 'cap-paste':
       if (navigator.clipboard && navigator.clipboard.readText) {
         navigator.clipboard.readText().then((t) => { $('#capIn').value = t; updateCapture(); }, () => { $('#capIn').focus(); toast('Long-press the box and choose Paste'); });
@@ -1016,11 +943,9 @@ function onClick(e) {
       const list = $('#setList').value.trim();
       if (list && !/^https?:\/\//.test(list)) { toast('The X List link must start with https://'); break; }
       setSettings({
-        dailyMinutes: Math.max(0, Math.min(240, parseInt($('#setMin').value, 10) || 0)),
         todayCount: Math.max(1, Math.min(50, parseInt($('#setCount').value, 10) || 5)),
         xListUrl: list,
       });
-      renderTimer();
       toast('Saved');
       break;
     }
@@ -1178,7 +1103,6 @@ async function init() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && syncOn() && Date.now() - lastPull > 60000) pullRemote();
   });
-  setInterval(tick, 1000);
 
   render();
   handleIncomingShare();
