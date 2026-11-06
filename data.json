@@ -70,7 +70,7 @@
     {
       "id": "mw4fh1t2rvf5c",
       "added": "2026-11-06T03:41:39.302Z",
-      "name": "",
+      "name": "Ryo Lu",
       "handle": "ryolu_",
       "platform": "x",
       "url": "https://x.com/ryolu_",
@@ -80,8 +80,11 @@
       "tags": [
         "Design"
       ],
-      "updated": "2026-11-06T03:41:51.052Z",
-      "enrichTries": 1
+      "updated": "2026-11-06T03:42:00.997Z",
+      "enrichTries": 1,
+      "avatar": "https://pbs.twimg.com/profile_images/1915014653295697921/KmMbglaO_400x400.jpg",
+      "bio": "Designed @Cursor_ai, @NotionHQ, @Stripe, built startups. I make a world where anyone can make software. Aspiring k-pop idol.",
+      "enriched": "2026-11-06T03:42:00.997Z"
     }
   ],
   "items": [
