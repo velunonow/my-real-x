@@ -341,8 +341,11 @@
       "videoId": "",
       "title": "",
       "note": "",
-      "tags": [],
-      "updated": "2026-11-07T14:55:49.094Z"
+      "tags": [
+        "Design",
+        "AI"
+      ],
+      "updated": "2026-11-07T14:55:52.316Z"
     }
   ],
   "ideas": [
