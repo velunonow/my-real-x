@@ -7,9 +7,10 @@
       "Business",
       "Learning",
       "Writing",
-      "Design"
+      "Design",
+      "Builder"
     ],
-    "updated": "2026-11-04T15:00:00.000Z",
+    "updated": "2026-11-07T15:25:09.092Z",
     "dailyMinutes": 15,
     "todayCount": 5
   },
@@ -98,9 +99,10 @@
       "foundVia": "",
       "tags": [
         "AI",
-        "Design"
+        "Design",
+        "Builder"
       ],
-      "updated": "2026-11-07T15:25:02.588Z"
+      "updated": "2026-11-07T15:25:09.093Z"
     }
   ],
   "items": [
