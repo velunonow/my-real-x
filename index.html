@@ -18,17 +18,16 @@
 </head>
 <body>
   <header class="top">
-    <a class="wordmark" href="./" data-act="goto" data-view="today">my real <em>x</em></a>
+    <a class="wordmark" href="./" data-act="goto" data-view="library">my real <em>x</em></a>
     <button id="sync" class="pill" type="button"></button>
-    <button id="gear" class="icon-btn" type="button" aria-label="Settings" data-act="goto" data-view="settings"></button>
   </header>
   <main id="main"><p class="sub">Loading…</p></main>
   <nav class="tabbar" id="nav" aria-label="Main">
-    <button type="button" data-view="today"></button>
     <button type="button" data-view="library"></button>
+    <button type="button" data-view="people"></button>
     <button type="button" id="addBtn" class="add" aria-label="Add something"></button>
     <button type="button" data-view="create"></button>
-    <button type="button" data-view="people"></button>
+    <button type="button" data-view="settings"></button>
   </nav>
   <dialog id="sheet"><div id="sheetBody" class="sheet-inner"></div></dialog>
   <div id="toast" role="status"></div>

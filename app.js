@@ -42,7 +42,6 @@ const PROMPTS = [
 
 /* ---------- icons (one stroke family) ---------- */
 const ICONS = {
-  today: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/>',
   collect: '<path d="M6.5 3.5h11v17l-5.5-3.8-5.5 3.8z"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
@@ -89,7 +88,7 @@ function toast(msg) {
 
 /* ---------- data ---------- */
 let db = normalize({});
-let view = 'today';
+let view = 'library';
 let libLimit = LIB_PAGE;
 let promptShift = 0;
 const filters = { lib: { q: '', status: '', tag: '' }, people: { status: 'trusted', tag: '' } };
@@ -97,7 +96,7 @@ const filters = { lib: { q: '', status: '', tag: '' }, people: { status: 'truste
 function normalize(d) {
   d = d && typeof d === 'object' ? d : {};
   const out = { version: 1 };
-  out.settings = Object.assign({ dailyMinutes: 15, todayCount: 5, xListUrl: '', tags: DEFAULT_TAGS.slice(), updated: '' }, d.settings || {});
+  out.settings = Object.assign({ xListUrl: '', tags: DEFAULT_TAGS.slice(), updated: '' }, d.settings || {});
   if (!Array.isArray(out.settings.tags)) out.settings.tags = DEFAULT_TAGS.slice();
   for (const k of ['creators', 'items', 'ideas']) out[k] = Array.isArray(d[k]) ? d[k].filter((x) => x && x.id) : [];
   return out;
@@ -268,15 +267,6 @@ function makingStreak() {
   while (s.has(localDate(d))) { n++; d.setDate(d.getDate() - 1); }
   return n;
 }
-function weekStats() {
-  const c = new Date(); c.setDate(c.getDate() - 6);
-  const cutoff = localDate(c);
-  return {
-    read: live('items').filter((i) => i.readAt && dayOf(i.readAt) >= cutoff).length,
-    made: live('ideas').filter((i) => (i.days || []).some((d) => d >= cutoff)).length,
-    pub: live('ideas').filter((i) => i.publishedAt && dayOf(i.publishedAt) >= cutoff).length,
-  };
-}
 function streakHtml() {
   const n = makingStreak();
   return n ? `<span class="streak">${icon('flame')}${plural(n, 'day')} of making</span>` : '<span class="streak">Make one thing to start a streak</span>';
@@ -284,10 +274,6 @@ function streakHtml() {
 function currentPrompt() {
   const dayNum = Math.floor(new Date(today()).getTime() / 864e5);
   return PROMPTS[(dayNum + promptShift) % PROMPTS.length];
-}
-function greeting() {
-  const h = new Date().getHours();
-  return h < 5 ? 'Still up?' : h < 12 ? 'Good morning.' : h < 18 ? 'Good afternoon.' : 'Good evening.';
 }
 
 /* ---------- URL parsing ---------- */
@@ -388,15 +374,6 @@ function tagChips(selected, scope) {
   return `<div class="chips wrap">${allTags().map((t) => `<button type="button" class="chip" data-act="tag-toggle" data-scope="${scope}" data-tag="${esc(t)}" aria-pressed="${selected.includes(t)}">${esc(t)}</button>`).join('')}
     <input class="chip-input" data-newtag="${scope}" placeholder="+ New tag" enterkeyhint="done" autocomplete="off"></div>`;
 }
-function doneMomentHtml() {
-  return `<section class="field-moment">
-    <h2 class="display">That’s today’s reading.</h2>
-    <p>The rest can wait until tomorrow. Now use what you read.</p>
-    <div class="choice-grid">
-      <button type="button" class="choice tilt-l" data-act="goto" data-view="create">${icon('pen')}<span>Make something</span></button>
-      <button type="button" class="choice dark tilt-r" data-act="open-capture">${icon('plus')}<span>Write down a thought</span></button>
-    </div></section>`;
-}
 function syncTipHtml() {
   if (syncOn() || load(LS.syncTip)) return '';
   return `<div class="card pad small muted" style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">
@@ -410,8 +387,7 @@ function tileCard(it, even = false) {
   const quote = it.type === 'x' && it.text && !img && !it.title;
   // Even grid: every card gets the same picture area (a placeholder when there is no photo).
   const pic = even ? (quote ? '' : `<div class="ph">${img ? imgTag(img) : typeIcon(it) || icon('link')}</div>`) : imgTag(img);
-  const flag = view === 'today' ? (it.status === 'read' ? '<span class="flag muted">Read</span>' : '')
-    : it.status === 'unread' ? '<span class="flag">To read</span>' : it.status === 'archived' ? '<span class="flag muted">Dropped</span>' : '';
+  const flag = '';
   return `<article class="card tile ${quote ? 'quote' : ''}" data-card="${it.id}" data-kind="items" data-open>
     ${pic}
     <div class="tile-body">
@@ -448,49 +424,15 @@ function personCard(c) {
 }
 
 /* ---------- views ---------- */
-function renderToday() {
-  const s = db.settings;
-  const items = live('items');
-  const t = today();
-  const readToday = items.filter((i) => i.readAt && dayOf(i.readAt) === t);
-  const unread = items.filter((i) => i.status === 'unread').sort((a, b) => (a.added || '').localeCompare(b.added || ''));
-  const todays = unread.slice(0, Math.max(0, s.todayCount - readToday.length));
-  const wk = weekStats();
-  let html = `<section class="page-head">
-      <h1 class="display">${greeting()}</h1>
-      <p class="sub">${todays.length ? `${readToday.length} of ${s.todayCount} read today. Tap a card to read it.` : readToday.length ? 'All read for today.' : 'Nothing to read yet.'}</p>
-    </section>
-    ${syncTipHtml()}
-    <section class="card forest pad">
-      ${streakHtml()}
-      <p class="display-s" style="margin-top:14px">${esc(currentPrompt())}</p>
-      <div class="actions">
-        <button type="button" class="btn light" data-act="draft-from-prompt">${icon('pen')}Start writing</button>
-        <button type="button" class="btn ghost-light" data-act="another-prompt">Another prompt</button>
-      </div>
-      <p class="tiny" style="margin:16px 0 0">Last 7 days: read ${wk.read} · made ${wk.made} · published ${wk.pub}${wk.read > wk.made * 2 + 1 ? '. You’re reading more than making — make one thing next.' : ''}</p>
-    </section>`;
-  if (!todays.length && readToday.length >= s.todayCount) html += doneMomentHtml();
-  else {
-    html += `<h2 class="section">Today’s reading<span class="count">${readToday.length}/${s.todayCount}</span></h2>`;
-    if (!todays.length) html += `<div class="card empty"><p class="display-s">Nothing waiting.</p>Tap <b>+</b> to save a post, article or video. Or visit one of your people on purpose.</div>`;
-  }
-  const cards = [...todays, ...readToday];
-  if (cards.length) html += `<div class="even" style="margin-top:${todays.length ? 0 : 18}px">${cards.map((c) => tileCard(c, true)).join('')}</div>`;
-  return html;
-}
-
 function renderLibrary() {
   const f = filters.lib;
   const items = live('items');
-  const count = (st) => items.filter((i) => i.status === st).length;
   return `<section class="page-head">
       <h1 class="display">Collection</h1>
       <p class="sub">${plural(items.length, 'thing')} you chose to keep.</p>
     </section>
+    ${syncTipHtml()}
     <div class="search">${icon('search')}<input type="search" data-filter="lib.q" placeholder="Search your collection" value="${esc(f.q)}" enterkeyhint="search"></div>
-    <div class="chips">${chipsHtml([['', 'Everything', items.length], ['unread', 'To read', count('unread')], ['reference', 'Reference', count('reference')], ['read', 'Read', count('read')], ...(count('archived') ? [['archived', 'Dropped', count('archived')]] : [])], f.status,
-      (v) => `data-act="filter" data-group="lib" data-key="status" data-val="${esc(v)}"`)}</div>
     <div class="chips">${chipsHtml([['', 'All tags'], ...allTags().map((t) => [t, t]), ['__none', 'No tag yet']], f.tag,
       (v) => `data-act="filter" data-group="lib" data-key="tag" data-val="${esc(v)}"`)}</div>
     <div id="libList"></div>`;
@@ -575,9 +517,8 @@ function renderSettings() {
   const g = sync || guessSync();
   return `<section class="page-head"><h1 class="display">Settings</h1></section>
     <div class="settings">
-    <section class="card"><h3>Habits</h3>
-      <label><span class="field-label" style="margin-top:0">Things to read per day</span><input class="boxed" type="number" min="1" max="50" id="setCount" value="${esc(s.todayCount)}" inputmode="numeric" style="max-width:160px"></label>
-      <label><span class="field-label">My X List link (optional)</span><input class="boxed" type="url" id="setList" placeholder="https://x.com/i/lists/…" value="${esc(s.xListUrl)}"></label>
+    <section class="card"><h3>X List</h3>
+      <label><span class="field-label" style="margin-top:0">My X List link (optional)</span><input class="boxed" type="url" id="setList" placeholder="https://x.com/i/lists/…" value="${esc(s.xListUrl)}"></label>
       <div class="actions"><button type="button" class="btn primary" data-act="settings-save">Save</button></div>
     </section>
     <section class="card"><h3>Tags</h3>
@@ -622,7 +563,7 @@ function renderSettings() {
 function render() {
   $$('#nav [data-view]').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
   const main = $('#main');
-  const fn = { today: renderToday, create: renderCreate, library: renderLibrary, people: renderPeople, settings: renderSettings }[view] || renderToday;
+  const fn = { create: renderCreate, library: renderLibrary, people: renderPeople, settings: renderSettings }[view] || renderLibrary;
   main.innerHTML = fn();
   if (view === 'library') renderLibList();
   if (view === 'people') renderPeopleList();
@@ -673,7 +614,7 @@ function detect(text) {
   if (existing) return { kind: 'item', p, existing, hint: 'Already in your collection — saving opens it.' };
   if (/^https:\/\/x\.com\/i\/article\//.test(p.url)) return { kind: 'item', p, hint: 'An X article. Tip: save the post that shares it (x.com/name/status/…) instead — that way you get its title and cover photo.' };
   const what = p.type === 'x' ? `An X post${p.handle ? ` by @${p.handle}` : ''}` : p.type === 'youtube' ? 'A YouTube video' : `A link from ${hostOf(p.url)}`;
-  return { kind: 'item', p, hint: `${what} — it goes to Today’s reading.` };
+  return { kind: 'item', p, hint: `${what} — it will be saved to your collection.` };
 }
 function updateCapture() {
   const t = $('#capIn');
@@ -701,7 +642,7 @@ function captureSave() {
     showSaved('creators', c.id);
     return;
   }
-  if (d.existing) { openItem(d.existing.id, { markRead: false }); return; }
+  if (d.existing) { openItem(d.existing.id); return; }
   const it = { id: uid(), added: nowIso(), status: 'unread', url: d.p.url, type: d.p.type, handle: d.p.handle || '', videoId: d.p.videoId || '', title: '', note: '', tags: [] };
   upsert('items', it);
   showSaved('items', it.id);
@@ -713,9 +654,7 @@ function showSaved(kind, id) {
   if (kind === 'items') {
     preview = tileCard(rec).replace(' data-open', '');
     const c = rec.handle ? findCreator('x', rec.handle) : null;
-    extra = `<span class="field-label">Where should it go?</span>
-      <div class="seg">${[['unread', 'Read it in Today'], ['reference', 'Just keep it']].map(([v, l]) => `<button type="button" data-act="set-status" data-scope="cap" data-status="${v}" aria-pressed="${rec.status === v}">${l}</button>`).join('')}</div>
-      ${rec.handle && !c ? `<div class="chips" style="margin-top:14px"><button type="button" class="chip" data-act="follow-author" aria-pressed="false">Follow @${esc(rec.handle)} on trial</button></div>` : ''}`;
+    extra = `${rec.handle && !c ? `<div class="chips" style="margin-top:22px"><button type="button" class="chip" data-act="follow-author" aria-pressed="false">Follow @${esc(rec.handle)} on trial</button></div>` : ''}`;
   } else if (kind === 'creators') {
     preview = personCard(rec).replace(' data-open', '');
     extra = `<span class="field-label">Trust</span><div class="seg">${[['trial', `On trial (${TRIAL_DAYS} days)`], ['trusted', 'Trusted']].map(([v, l]) => `<button type="button" data-act="set-status" data-scope="cap" data-status="${v}" aria-pressed="${rec.status === v}">${l}</button>`).join('')}</div>`;
@@ -766,10 +705,9 @@ function saveBulk() {
 }
 
 /* detail sheets: edit in place, no forms */
-function openItem(id, { markRead = true } = {}) {
+function openItem(id) {
   const it = byId('items', id);
   if (!it) return;
-  if (markRead && it.status === 'unread') { it.status = 'read'; it.readAt = nowIso(); upsert('items', it); }
   const media = embedHtml(it);
   openSheet(`
     ${media ? `<div class="sheet-media">${media}</div>` : ''}
@@ -942,7 +880,6 @@ function onClick(e) {
       const list = $('#setList').value.trim();
       if (list && !/^https?:\/\//.test(list)) { toast('The X List link must start with https://'); break; }
       setSettings({
-        todayCount: Math.max(1, Math.min(50, parseInt($('#setCount').value, 10) || 5)),
         xListUrl: list,
       });
       toast('Saved');
@@ -1067,9 +1004,8 @@ function handleIncomingShare() {
 /* ---------- start ---------- */
 async function init() {
   // icons in static chrome
-  $('#gear').innerHTML = icon('settings');
   $('#addBtn').innerHTML = icon('plus');
-  const tabs = { today: ['today', 'Today'], library: ['collect', 'Collection'], create: ['pen', 'Create'], people: ['people', 'People'] };
+  const tabs = { library: ['collect', 'Collection'], people: ['people', 'People'], create: ['pen', 'Create'], settings: ['settings', 'Settings'] };
   $$('#nav [data-view]').forEach((b) => { const [ic, label] = tabs[b.dataset.view]; b.innerHTML = `${icon(ic)}<span>${label}</span>`; });
 
   let base = null;

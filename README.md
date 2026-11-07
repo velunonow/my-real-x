@@ -9,8 +9,7 @@ Live: https://velunonow.github.io/my-real-x/
 
 | Tab | What it does |
 |---|---|
-| **Today** | 5 things to read, as cards. Tap one to read it. When all 5 are read: "That’s today’s reading." Any read can become an idea. |
-| **Collection** | Everything you kept, as a two-column wall of cards with photos. Filter by To read / Reference / Read, and by tag. |
+| **Collection** | The home page: everything you kept, as a two-column wall of cards with photos. Search, and filter by tag. |
 | **+** | One box for everything: paste a link (post, video, article, profile) or write a thought. It works out the rest. |
 | **Create** | Ideas, drafts and published posts. A daily prompt, a making streak, "Post on X". |
 | **People** | Trusted people and newcomers on a 14-day trial. Visit on purpose; keep or drop. |

@@ -129,7 +129,7 @@ A quiet, light room full of physical cards — and one deep forest green that sh
 
 - **Ground (#EEF0EC):** a light green-gray, cooler than paper. Never pure white, never cream.
 - **Card (#FFFFFF):** every unit of content sits on white.
-- **Forest (#1E5B3A):** the signature. Used for the main action, the "make" card, and **full-field moments** (capture sheet, done-for-today). White text on forest passes AA (8:1).
+- **Forest (#1E5B3A):** the signature. Used for the main action, the "make" card, and **full-field moments** (capture sheet, saved moment). White text on forest passes AA (8:1).
 - **Forest-soft (#E1ECE4):** quiet tint for secondary actions and takeaways.
 - **Night (#151B17):** the second contrast — one dark card beside a white one at special moments.
 - Everything else is ink and two grays. No other hues except danger red for delete.
@@ -144,9 +144,8 @@ A quiet, light room full of physical cards — and one deep forest green that sh
 
 - Phone first, 16px gutter, content max 760px.
 - **One card = one thing.** Never a card inside a card.
-- Today: an **even grid** (2 columns on phones, 3 on wide screens). Every card has the same picture shape (1.91:1, a soft forest placeholder when there is no photo), titles stop at 3 lines, and cards in a row share one height. A short daily list should look calm and orderly.
-- Collection, Create and People: a **two-column masonry** where each card is as tall as its content, for browsing a big collection like a wall of paper.
-- Navigation: a floating bottom tab bar with the forest **+** in the middle.
+- Collection (the home page), Create and People: a **two-column masonry** where each card is as tall as its content, for browsing a big collection like a wall of paper.
+- Navigation: a floating bottom tab bar (Collection, People, **+**, Create, Settings) with the forest **+** in the middle.
 
 ## Elevation & Depth
 
