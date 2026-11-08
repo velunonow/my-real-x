@@ -516,7 +516,7 @@ function renderLibList() {
       (!q || [i.title, i.note, i.text, i.takeaway, i.handle, i.author, i.url, ...(i.tags || [])].join(' ').toLowerCase().includes(q)))
     .sort((a, b) => (b.added || '').localeCompare(a.added || ''));
   el.innerHTML = list.length
-    ? `<div class="masonry">${list.slice(0, libLimit).map(tileCard).join('')}</div>${list.length > libLimit ? '<button type="button" class="btn block" data-act="more-lib">Show more</button>' : ''}`
+    ? `<div class="masonry dense">${list.slice(0, libLimit).map(tileCard).join('')}</div>${list.length > libLimit ? '<button type="button" class="btn block" data-act="more-lib">Show more</button>' : ''}`
     : '<div class="card empty"><p class="display-s">Nothing here.</p>Try another filter, or tap + to add something.</div>';
 }
 
@@ -639,6 +639,7 @@ function renderSettings() {
 
 function render() {
   $$('#nav [data-view]').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+  document.body.dataset.view = view;
   const main = $('#main');
   const fn = { create: renderCreate, library: renderLibrary, people: renderPeople, settings: renderSettings }[view] || renderLibrary;
   main.innerHTML = fn();
