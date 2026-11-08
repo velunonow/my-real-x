@@ -408,6 +408,19 @@
       "desc": "For Claude to learn from experience, it has to decide what’s worth remembering before it knows what’s next. Here’s how “dreaming” helps it organize memory and correct mistakes.",
       "image": "https://www-cdn.anthropic.com/images/4zrzovbb/website/6ab2663a2c0bd6a41409d90136a59a5d72995ea5-1200x630.jpg",
       "enriched": "2026-11-08T05:51:41.269Z"
+    },
+    {
+      "id": "mw7ua4j23m6sk",
+      "added": "2026-11-08T12:59:29.006Z",
+      "status": "unread",
+      "url": "https://www.youtube.com/watch?v=qjPH9njnaVU",
+      "type": "youtube",
+      "handle": "",
+      "videoId": "qjPH9njnaVU",
+      "title": "",
+      "note": "",
+      "tags": [],
+      "updated": "2026-11-08T12:59:29.006Z"
     }
   ],
   "ideas": [
@@ -435,5 +448,7 @@
       "days": [],
       "updated": "2026-11-05T03:17:01.536Z"
     }
-  ]
+  ],
+  "outputs": [],
+  "output_inputs": []
 }
