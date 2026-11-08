@@ -150,6 +150,45 @@ button.rowcard { width: 100%; border: 0; text-align: left; font: inherit; color:
 .mini-card .ph-s { display: grid; place-items: center; background: var(--forest-soft); color: var(--forest); }
 .mini-card p { margin: 9px 11px 11px; padding: 0; font-family: var(--serif); font-size: 15px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
+/* ---------- Collection: dense wall ---------- */
+/* Wider page and smaller, tighter cards so many saves fit on one screen:
+   2 columns on a phone, up to 7 on a wide desktop. Other pages keep the roomy layout. */
+body[data-view="library"] main { max-width: 1280px; padding-top: 0; }
+body[data-view="library"] .page-head { margin: 6px 2px 12px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+body[data-view="library"] .page-head .display { font-size: clamp(30px, 7vw, 38px); }
+body[data-view="library"] .page-head .sub { margin: 0; font-size: 14px; }
+body[data-view="library"] .search { margin-bottom: 10px; border-radius: 14px; }
+body[data-view="library"] .search input { padding: 9px 0; }
+body[data-view="library"] .chips { margin-bottom: 4px; }
+body[data-view="library"] .chip { padding: 6px 12px; font-size: 13.5px; }
+body[data-view="library"] .nudge { margin-bottom: 12px; }
+body[data-view="library"] .nudge .section { font-size: 21px; }
+body[data-view="library"] .nudge .sub { margin: 2px 0 8px !important; }
+body[data-view="library"] .mini-card { flex-basis: 120px; }
+body[data-view="library"] .mini-card img, body[data-view="library"] .mini-card .ph-s { height: 60px; }
+body[data-view="library"] .mini-card p { font-size: 13.5px; margin: 7px 9px 9px; }
+@media (max-width: 600px) {
+  body[data-view="library"] .nudge .sub { display: none; }
+  body[data-view="library"] .nudge .section { font-size: 19px; }
+  body[data-view="library"] .mini-card { flex-basis: 108px; }
+  body[data-view="library"] .mini-card img, body[data-view="library"] .mini-card .ph-s { height: 46px; }
+  body[data-view="library"] .mini-card p { font-size: 12.5px; -webkit-line-clamp: 2; margin: 6px 8px 8px; }
+  body[data-view="library"] .page-head .sub { font-size: 13px; }
+}
+.masonry.dense { columns: 150px auto; column-gap: 8px; margin-top: 8px; }
+.masonry.dense > * { margin-bottom: 8px; }
+.dense .tile { border-radius: 16px; box-shadow: 0 1px 2px rgba(18, 40, 26, .05), 0 6px 16px -10px rgba(18, 40, 26, .3); }
+/* every picture the same wide shape: short on phones, keeps the wall tight */
+.dense .tile .media { aspect-ratio: 16 / 9; height: auto; max-height: none; }
+.dense .tile-body { padding: 9px 10px 10px; }
+.dense .tile .t { font-size: 15px; line-height: 1.3; margin: 0 0 5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.dense .tile .q { font-size: 14px; line-height: 1.38; margin: 0 0 6px; -webkit-line-clamp: 5; }
+.dense .tile.quote .tile-body { padding: 10px; }
+.dense .tile.quote .q::before { font-size: 34px; height: 18px; }
+.dense .src { font-size: 12px; gap: 4px; }
+.dense .src svg.i { width: 13px; height: 13px; }
+.dense .made { margin-top: 4px; font-size: 11.5px; }
+
 /* rows */
 .rowcard { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
 .rowcard .t { flex: 1; min-width: 0; font-family: var(--serif); font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
