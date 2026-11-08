@@ -390,6 +390,21 @@
       "author": "Thorsten Ball",
       "image": "https://pbs.twimg.com/media/HVfOvcmXkAAhUhz.jpg",
       "enriched": "2026-11-08T04:36:16.465Z"
+    },
+    {
+      "id": "mw7ezqjoslqbc",
+      "added": "2026-11-08T05:51:30.084Z",
+      "status": "unread",
+      "url": "https://www.anthropic.com/research/components-of-agent-memory",
+      "type": "web",
+      "handle": "",
+      "videoId": "",
+      "title": "",
+      "note": "",
+      "tags": [
+        "AI"
+      ],
+      "updated": "2026-11-08T05:51:31.701Z"
     }
   ],
   "ideas": [
