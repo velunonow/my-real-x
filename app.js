@@ -6,7 +6,9 @@
  */
 
 const DEFAULT_TAGS = ['AI', 'Business', 'Learning', 'Writing'];
-const LS = { data: 'mrx.data.v1', sync: 'mrx.sync.v1', syncTip: 'mrx.syncTip.v1' };
+const LS = { data: 'mrx.data.v1', sync: 'mrx.sync.v1', syncTip: 'mrx.syncTip.v1', nudge: 'mrx.nudgeHidden.v1' };
+// outputs: things I made. output_inputs: which saves fed each output (many to many).
+const TABLES = ['creators', 'items', 'ideas', 'outputs', 'output_inputs'];
 const TRIAL_DAYS = 14;
 const TRUSTED_SOFT_MAX = 30;
 const LIB_PAGE = 40;
@@ -98,14 +100,14 @@ function normalize(d) {
   const out = { version: 1 };
   out.settings = Object.assign({ xListUrl: '', tags: DEFAULT_TAGS.slice(), updated: '' }, d.settings || {});
   if (!Array.isArray(out.settings.tags)) out.settings.tags = DEFAULT_TAGS.slice();
-  for (const k of ['creators', 'items', 'ideas']) out[k] = Array.isArray(d[k]) ? d[k].filter((x) => x && x.id) : [];
+  for (const k of TABLES) out[k] = Array.isArray(d[k]) ? d[k].filter((x) => x && x.id) : [];
   return out;
 }
 // Merge two copies record by record; the newer `updated` wins. Deletions are kept as tombstones.
 function mergeDb(a, b) {
   const out = normalize({});
   out.settings = (a.settings.updated || '') >= (b.settings.updated || '') ? a.settings : b.settings;
-  for (const k of ['creators', 'items', 'ideas']) {
+  for (const k of TABLES) {
     const m = new Map();
     for (const x of [...b[k], ...a[k]]) {
       const y = m.get(x.id);
@@ -152,6 +154,36 @@ function addDay(idea) {
   idea.days = idea.days || [];
   if (!idea.days.includes(d)) idea.days.push(d);
 }
+
+/* ---------- outputs: things I made, linked to the saves behind them ---------- */
+const OUTPUT_TYPES = [['post', 'Post'], ['product', 'Product'], ['note', 'Note']];
+const outputTypeLabel = (t) => (OUTPUT_TYPES.find(([v]) => v === t) || OUTPUT_TYPES[2])[1];
+const outputTitle = (o) => o.title || `Untitled ${outputTypeLabel(o.type).toLowerCase()}`;
+const linkId = (outputId, itemId) => `${outputId}~${itemId}`;
+const liveLinks = () => live('output_inputs');
+function inputsOf(outputId) {
+  return liveLinks().filter((l) => l.output_id === outputId).map((l) => byId('items', l.item_id)).filter(Boolean);
+}
+function outputsFrom(itemId) {
+  return liveLinks().filter((l) => l.item_id === itemId).map((l) => byId('outputs', l.output_id)).filter(Boolean)
+    .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+}
+function setLink(outputId, itemId, on) {
+  const id = linkId(outputId, itemId);
+  const linked = !!byId('output_inputs', id);
+  if (on && !linked) upsert('output_inputs', { id, output_id: outputId, item_id: itemId });
+  if (!on && linked) removeRec('output_inputs', id);
+}
+function newOutput(itemIds = []) {
+  const o = { id: uid(), type: 'post', title: '', url: '', notes: '', created_at: nowIso() };
+  upsert('outputs', o);
+  itemIds.forEach((itemId) => setLink(o.id, itemId, true));
+  openOutput(o.id);
+  setTimeout(() => { const t = $('#sheetBody [data-field=title]'); if (t) t.focus(); }, 80);
+  return o;
+}
+const madeLine = (it) => { const n = outputsFrom(it.id).length; return `<p class="made ${n ? 'yes' : ''}">${n ? `Made from this: ${n}` : 'Nothing yet'}</p>`; };
+const weekKey = () => Math.floor(new Date(today()).getTime() / (7 * 864e5));
 
 /* ---------- GitHub sync (optional) ---------- */
 let sync = load(LS.sync);
@@ -393,7 +425,7 @@ function tileCard(it, even = false) {
     <div class="tile-body">
       ${quote ? `<p class="q">${esc(clip(it.text, 320))}</p>` : `<h3 class="t">${esc(itemTitle(it))}</h3>`}
       <p class="src">${typeIcon(it)}<span>${esc(sourceLine(it))}</span></p>
-      ${flag}
+      ${madeLine(it)}${flag}
     </div></article>`;
 }
 function rowCard(it) {
@@ -411,6 +443,28 @@ function ideaCard(i) {
       <span class="flag ${i.status === 'published' ? '' : 'muted'}">${label}</span>
     </div></article>`;
 }
+function outputCard(o) {
+  const ins = inputsOf(o.id);
+  return `<article class="card tile output" data-card="${o.id}" data-kind="outputs" data-open>
+    <div class="tile-body">
+      <span class="flag">${outputTypeLabel(o.type)}</span>
+      <h3 class="t" style="margin-top:10px">${esc(outputTitle(o))}</h3>
+      <p class="src"><span>${esc(dayOf(o.created_at))}${o.url ? ` · ${esc(hostOf(o.url))}` : ''}</span></p>
+      ${ins.length ? `<div class="fed">${ins.slice(0, 3).map((it) => `<span>${itemImage(it) ? imgTag(itemImage(it), 'mini') : ''}${esc(clip(itemTitle(it), 42))}</span>`).join('')}${ins.length > 3 ? `<span class="muted">+ ${ins.length - 3} more</span>` : ''}</div>`
+        : '<p class="tiny muted" style="margin:8px 0 0">Not linked to any saves yet</p>'}
+    </div></article>`;
+}
+function linkRow(it, mode) {
+  const img = itemImage(it);
+  const thumb = img ? imgTag(img, 'thumb') : `<span class="thumb" style="display:grid;place-items:center;color:var(--faint)">${typeIcon(it) || icon('link')}</span>`;
+  if (mode === 'linked') {
+    return `<div class="card rowcard">${thumb}<span class="t">${esc(itemTitle(it))}</span>
+      <button type="button" class="close" style="width:32px;height:32px;background:var(--sunk)" data-act="unlink" data-item="${it.id}" aria-label="Unlink">${icon('close')}</button></div>`;
+  }
+  const on = mode === 'on';
+  return `<button type="button" class="card rowcard pick ${on ? 'on' : ''}" data-act="link-toggle" data-item="${it.id}" aria-pressed="${on}">${thumb}<span class="t">${esc(itemTitle(it))}</span>${on ? icon('check') : icon('plus')}</button>`;
+}
+
 function personCard(c) {
   const trialDay = daysSince(c.trialStart || c.added) + 1;
   const due = c.status === 'trial' && trialDay > TRIAL_DAYS;
@@ -432,10 +486,25 @@ function renderLibrary() {
       <p class="sub">${plural(items.length, 'thing')} you chose to keep.</p>
     </section>
     ${syncTipHtml()}
+    ${nudgeHtml()}
     <div class="search">${icon('search')}<input type="search" data-filter="lib.q" placeholder="Search your collection" value="${esc(f.q)}" enterkeyhint="search"></div>
     <div class="chips">${chipsHtml([['', 'All tags'], ...allTags().map((t) => [t, t]), ['__none', 'No tag yet']], f.tag,
       (v) => `data-act="filter" data-group="lib" data-key="tag" data-val="${esc(v)}"`)}</div>
     <div id="libList"></div>`;
+}
+function nudgeHtml() {
+  if (load(LS.nudge) === weekKey()) return '';
+  const weekAgo = Date.now() - 7 * 864e5;
+  const idle = live('items').filter((i) => i.added && new Date(i.added).getTime() < weekAgo && !outputsFrom(i.id).length)
+    .sort((a, b) => (a.added || '').localeCompare(b.added || ''));
+  if (!idle.length) return '';
+  return `<section class="nudge">
+    <div class="row-head"><h2 class="section" style="margin:0">Waiting for you<span class="count">${idle.length}</span></h2>
+      <button type="button" class="btn quiet" data-act="hide-nudge">Hide this week</button></div>
+    <p class="sub small" style="margin:4px 0 12px">Saved over a week ago, nothing made from them yet.</p>
+    <div class="strip">${idle.slice(0, 12).map((it) => `<article class="card mini-card" data-card="${it.id}" data-kind="items" data-open>
+      ${itemImage(it) ? imgTag(itemImage(it)) : `<div class="ph-s">${typeIcon(it) || icon('link')}</div>`}<p>${esc(clip(itemTitle(it), 60))}</p></article>`).join('')}</div>
+  </section>`;
 }
 function renderLibList() {
   const el = $('#libList');
@@ -451,6 +520,13 @@ function renderLibList() {
     : '<div class="card empty"><p class="display-s">Nothing here.</p>Try another filter, or tap + to add something.</div>';
 }
 
+function outputsSection() {
+  const outs = live('outputs').sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  return `<div class="row-head" style="margin:32px 4px 12px"><h2 class="section" style="margin:0">Things I made<span class="count">${outs.length}</span></h2>
+      <button type="button" class="btn soft" data-act="new-output">${icon('plus')}New</button></div>
+    ${outs.length ? `<div class="masonry">${outs.map(outputCard).join('')}</div>`
+      : '<div class="card empty"><p class="display-s">Nothing made yet.</p>Open anything in your collection and tap <b>Make something from this</b>, or tap New.</div>'}`;
+}
 function renderCreate() {
   const all = live('ideas').sort((a, b) => (b.updated || '').localeCompare(a.updated || ''));
   const group = (st) => all.filter((i) => i.status === st);
@@ -471,6 +547,7 @@ function renderCreate() {
       </div>
       <p class="tiny" style="margin:14px 0 0">For every two things you read, make one. Small counts.</p>
     </section>
+    ${outputsSection()}
     ${section('Drafts', group('draft'))}${section('Ideas', group('idea'))}${section('Published', group('published'))}
     ${all.length ? '' : '<div class="card empty" style="margin-top:14px"><p class="display-s">Your first idea goes here.</p>Write a thought above, or tap “Make from this” on anything you read.</div>'}`;
 }
@@ -717,12 +794,50 @@ function openItem(id) {
     <textarea class="plain note" data-field="note" rows="2" placeholder="Why is this worth your time? (optional)">${esc(it.note || '')}</textarea>
     <span class="field-label">Tags</span>
     ${tagChips(it.tags || [], 'item')}
+    <span class="field-label">Made from this</span>
+    ${(() => { const outs = outputsFrom(it.id); return outs.length ? outs.map((o) => `<button type="button" class="card rowcard pick" data-act="open-output" data-id="${o.id}"><span class="flag">${outputTypeLabel(o.type)}</span><span class="t">${esc(outputTitle(o))}</span>${icon('open')}</button>`).join('') : '<p class="small muted" style="margin:0">Nothing yet</p>'; })()}
     <div class="actions" style="margin-top:26px">
-      <button type="button" class="btn primary" data-act="make-idea">${icon('pen')}Make from this</button>
+      <button type="button" class="btn primary" data-act="make-output">${icon('pen')}Make something from this</button>
       <button type="button" class="btn danger" data-act="delete">${icon('trash')}Delete</button>
     </div>`, { ctx: { kind: 'item', table: 'items', id } });
   autoGrow();
 }
+function openOutput(id, { picking = false, q = '' } = {}) {
+  const o = byId('outputs', id);
+  if (!o) return;
+  const ins = inputsOf(o.id);
+  const urlHint = o.type === 'post' ? 'Link to the published X post' : o.type === 'product' ? 'Link to the product (optional)' : 'Link (optional)';
+  openSheet(`
+    <div class="seg">${OUTPUT_TYPES.map(([v, l]) => `<button type="button" data-act="out-type" data-type="${v}" aria-pressed="${o.type === v}">${l}</button>`).join('')}</div>
+    <textarea class="plain title" data-field="title" rows="1" placeholder="What did you make?" style="margin-top:20px">${esc(o.title || '')}</textarea>
+    <textarea class="plain note" data-field="notes" rows="2" placeholder="Notes (optional)">${esc(o.notes || '')}</textarea>
+    <span class="field-label">${o.type === 'post' ? 'Published post' : 'Link'}</span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input class="boxed" type="url" data-field="url" value="${esc(o.url || '')}" placeholder="${urlHint}" inputmode="url">
+      ${o.url && safeHref(o.url) !== '#' ? `<a class="btn soft" href="${esc(safeHref(o.url))}" target="_blank" rel="noopener" aria-label="Open link">${icon('open')}</a>` : ''}
+    </div>
+    <span class="field-label">Made on</span>
+    <input class="boxed" type="date" data-field="created_at" value="${esc(dayOf(o.created_at))}" style="max-width:200px">
+    <span class="field-label">Made from ${ins.length ? `(${ins.length})` : ''}</span>
+    <div id="linkedList">${ins.map((it) => linkRow(it, 'linked')).join('') || '<p class="small muted" style="margin:0 0 4px">No saves linked yet.</p>'}</div>
+    ${picking ? `<div class="search" style="margin:12px 0 10px">${icon('search')}<input type="search" id="pickQ" placeholder="Find a save to link" value="${esc(q)}" enterkeyhint="search"></div><div id="pickList"></div>`
+      : '<button type="button" class="btn soft" data-act="pick-open" style="margin-top:10px">' + icon('plus') + 'Link saves</button>'}
+    <div class="actions" style="margin-top:26px"><button type="button" class="btn danger" data-act="delete">${icon('trash')}Delete</button></div>`,
+  { ctx: { kind: 'output', table: 'outputs', id, picking, q } });
+  if (picking) renderPicker();
+  autoGrow();
+}
+function renderPicker() {
+  const el = $('#pickList');
+  if (!el || !sheetCtx || sheetCtx.table !== 'outputs') return;
+  const q = (($('#pickQ') || {}).value || '').trim().toLowerCase();
+  sheetCtx.q = q;
+  const linked = new Set(inputsOf(sheetCtx.id).map((i) => i.id));
+  const list = live('items').filter((i) => !q || [i.title, i.text, i.note, i.handle, i.author, i.url, ...(i.tags || [])].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => (b.added || '').localeCompare(a.added || '')).slice(0, 30);
+  el.innerHTML = list.map((it) => linkRow(it, linked.has(it.id) ? 'on' : 'off')).join('') || '<p class="small muted">No saves match.</p>';
+}
+
 function openPerson(id) {
   const c = byId('creators', id);
   if (!c) return;
@@ -802,7 +917,7 @@ function onClick(e) {
     case 'goto': closeSheet(); goView(a.dataset.view); break;
     case 'open':
       if (!rec) break;
-      if (table === 'items') openItem(rec.id); else if (table === 'ideas') openIdeaSheet(rec.id); else if (table === 'creators') openPerson(rec.id);
+      if (table === 'items') openItem(rec.id); else if (table === 'ideas') openIdeaSheet(rec.id); else if (table === 'creators') openPerson(rec.id); else if (table === 'outputs') openOutput(rec.id);
       break;
     case 'open-item': openItem(a.dataset.id); break;
     case 'open-idea': openIdeaSheet(a.dataset.id); break;
@@ -814,6 +929,23 @@ function onClick(e) {
       break;
     }
     case 'make-idea': if (rec) newIdeaFromItem(rec); break;
+    case 'make-output': if (rec) newOutput([rec.id]); break;
+    case 'new-output': newOutput(); break;
+    case 'open-output': openOutput(a.dataset.id); break;
+    case 'out-type': if (rec) { rec.type = a.dataset.type; upsert('outputs', rec); openOutput(rec.id, { picking: sheetCtx.picking, q: sheetCtx.q }); } break;
+    case 'pick-open': if (rec) { openOutput(rec.id, { picking: true }); setTimeout(() => { const p = $('#pickQ'); if (p) p.focus(); }, 60); } break;
+    case 'link-toggle':
+    case 'unlink': {
+      const o = sheetRec();
+      if (!o) break;
+      const itemId = a.dataset.item;
+      setLink(o.id, itemId, act === 'link-toggle' ? !byId('output_inputs', linkId(o.id, itemId)) : false);
+      const y = $('#sheet').scrollTop;
+      openOutput(o.id, { picking: sheetCtx.picking, q: sheetCtx.q });
+      $('#sheet').scrollTop = y;
+      break;
+    }
+    case 'hide-nudge': store(LS.nudge, weekKey()); render(); break;
     case 'set-status': {
       if (!rec) break;
       const st = a.dataset.status;
@@ -843,7 +975,13 @@ function onClick(e) {
     case 'delete': {
       if (!rec) break;
       const what = table === 'creators' ? 'Drop this person? Their saved posts stay in your collection. (Unfollow them on X too.)' : 'Delete this for good?';
-      if (confirm(what)) { removeRec(table, rec.id); closeSheet(); toast(table === 'creators' ? 'Dropped' : 'Deleted'); }
+      if (confirm(what)) {
+        if (table === 'items' || table === 'outputs') {
+          const key = table === 'items' ? 'item_id' : 'output_id';
+          liveLinks().filter((l) => l[key] === rec.id).forEach((l) => removeRec('output_inputs', l.id));
+        }
+        removeRec(table, rec.id); closeSheet(); toast(table === 'creators' ? 'Dropped' : 'Deleted');
+      }
       break;
     }
     case 'publish': {
@@ -928,10 +1066,14 @@ function onInput(e) {
     return;
   }
   if (t.id === 'capIn') { updateCapture(); return; }
+  if (t.id === 'pickQ') { renderPicker(); return; }
   if (t.matches('#sheetBody [data-field]')) {
     const rec = sheetRec();
     if (!rec) return;
-    rec[t.dataset.field] = t.value;
+    if (t.type === 'date') {
+      if (!t.value) return;
+      rec[t.dataset.field] = new Date(`${t.value}T12:00:00`).toISOString();
+    } else rec[t.dataset.field] = t.value;
     if (sheetCtx.table === 'ideas') {
       addDay(rec);
       if (rec.status === 'idea' && (rec.body || '').trim()) rec.status = 'draft';

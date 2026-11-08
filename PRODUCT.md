@@ -9,7 +9,8 @@ One person (me), on my phone first, laptop second. Not a pro designer. Wants to 
 ## The job
 1. **Collect** — save anything worth keeping in one tap: a link, a thought, a person.
 2. **Make something** — every read can become a takeaway, an idea, a draft, a post.
-3. **Keep my people few** — new people start on a 14-day trial; keep or drop.
+3. **Link what I make to what inspired it** — outputs (a post, a product, a note) point back to the saves behind them; every save shows "Made from this: N" or "Nothing yet".
+4. **Keep my people few** — new people start on a 14-day trial; keep or drop.
 
 ## Principles
 - **No feed.** Nothing arrives unless I saved it. No timers, no daily quotas, no "unread" pressure.

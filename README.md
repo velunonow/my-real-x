@@ -11,7 +11,7 @@ Live: https://velunonow.github.io/my-real-x/
 |---|---|
 | **Collection** | The home page: everything you kept, as a two-column wall of cards with photos. Search, and filter by tag. |
 | **+** | One box for everything: paste a link (post, video, article, profile) or write a thought. It works out the rest. |
-| **Create** | Ideas, drafts and published posts. A daily prompt, a making streak, "Post on X". |
+| **Create** | **Things I made** (posts, products, notes) linked to the saves that inspired them, plus ideas, drafts, a daily prompt and a making streak. |
 | **People** | Trusted people and newcomers on a 14-day trial. Visit on purpose; keep or drop. |
 
 ## Design
