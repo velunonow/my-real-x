@@ -399,12 +399,15 @@
       "type": "web",
       "handle": "",
       "videoId": "",
-      "title": "",
+      "title": "The components of agent memory",
       "note": "",
       "tags": [
         "AI"
       ],
-      "updated": "2026-11-08T05:51:31.701Z"
+      "updated": "2026-11-08T05:51:41.269Z",
+      "desc": "For Claude to learn from experience, it has to decide what’s worth remembering before it knows what’s next. Here’s how “dreaming” helps it organize memory and correct mistakes.",
+      "image": "https://www-cdn.anthropic.com/images/4zrzovbb/website/6ab2663a2c0bd6a41409d90136a59a5d72995ea5-1200x630.jpg",
+      "enriched": "2026-11-08T05:51:41.269Z"
     }
   ],
   "ideas": [
