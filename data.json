@@ -114,11 +114,13 @@
       "handle": "alexalbert__",
       "platform": "x",
       "url": "https://x.com/alexalbert__",
-      "status": "trial",
+      "status": "trusted",
       "note": "",
       "foundVia": "",
-      "tags": [],
-      "updated": "2026-11-10T03:11:18.759Z"
+      "tags": [
+        "AI"
+      ],
+      "updated": "2026-11-10T03:11:22.159Z"
     }
   ],
   "items": [
