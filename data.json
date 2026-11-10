@@ -488,7 +488,10 @@
       "tags": [
         "AI"
       ],
-      "updated": "2026-11-10T02:39:36.334Z"
+      "updated": "2026-11-10T02:39:48.435Z",
+      "text": "I really love using Fable 5.2. On big, open-ended work it feels like a major step above Opus 5.5. \n\nA few tips for getting the most out of it:\n- Ask what’s wrong with your idea before it builds anything. It’s great at brainstorming and will push back\n- Start on med/high effort, and save xhigh for hardest problems\n- Tell it up front what needs your approval (e.g. deleting things) and that the rest is its call\n- Give it a whole project instead of a next step and let it run for hours. This is where it shines",
+      "author": "Alex Albert",
+      "enriched": "2026-11-10T02:39:48.435Z"
     }
   ],
   "ideas": [
