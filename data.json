@@ -574,8 +574,11 @@
       "videoId": "",
       "title": "",
       "note": "",
-      "tags": [],
-      "updated": "2026-11-11T05:51:40.454Z"
+      "tags": [
+        "Business",
+        "AI"
+      ],
+      "updated": "2026-11-11T05:51:46.903Z"
     }
   ],
   "ideas": [
