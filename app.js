@@ -356,6 +356,15 @@ function sourceLine(it) {
   if (it.type === 'youtube') return it.author ? `${it.author} · YouTube` : 'YouTube';
   return it.site || hostOf(it.url);
 }
+const threadLen = (it) => (Array.isArray(it.thread) && it.thread.length > 1 ? it.thread.length : 0);
+function threadHtml(it) {
+  const n = it.thread.length;
+  return `<div class="thread">${it.thread.map((p, i) => `<section class="thread-part">
+      <span class="thread-n">${i + 1}/${n}</span>
+      ${p.text ? `<p class="post-text">${esc(p.text)}</p>` : ''}
+      ${p.image ? `<img class="thread-img" src="${esc(p.image)}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+    </section>`).join('')}</div>`;
+}
 const typeIcon = (it) => (it.type === 'x' ? '' : icon(it.type === 'youtube' ? 'play' : 'link'));
 function itemImage(it) {
   if (it.image) return it.image;
@@ -419,11 +428,11 @@ function tileCard(it, even = false) {
   const quote = it.type === 'x' && it.text && !img && !it.title;
   // Even grid: every card gets the same picture area (a placeholder when there is no photo).
   const pic = even ? (quote ? '' : `<div class="ph">${img ? imgTag(img) : typeIcon(it) || icon('link')}</div>`) : imgTag(img);
-  const flag = '';
+  const flag = threadLen(it) ? `<span class="flag thread-flag">Thread · ${threadLen(it)} posts</span>` : '';
   return `<article class="card tile ${quote ? 'quote' : ''}" data-card="${it.id}" data-kind="items" data-open>
     ${pic}
     <div class="tile-body">
-      ${quote ? `<p class="q">${esc(clip(it.text, 320))}</p>` : `<h3 class="t">${esc(itemTitle(it))}</h3>`}
+      ${quote || (it.type === 'x' && it.text && !it.title) ? `<p class="q">${esc(clip(it.text, 320))}</p>` : `<h3 class="t">${esc(itemTitle(it))}</h3>`}
       <p class="src">${typeIcon(it)}<span>${esc(sourceLine(it))}</span></p>
       ${madeLine(it)}${flag}
     </div></article>`;
@@ -513,7 +522,7 @@ function renderLibList() {
   const q = f.q.trim().toLowerCase();
   const list = live('items').filter((i) => (!f.status || i.status === f.status) &&
       (!f.tag || (f.tag === '__none' ? !(i.tags || []).length : (i.tags || []).includes(f.tag))) &&
-      (!q || [i.title, i.note, i.text, i.takeaway, i.handle, i.author, i.url, ...(i.tags || [])].join(' ').toLowerCase().includes(q)))
+      (!q || [i.title, i.note, i.text, i.takeaway, i.handle, i.author, i.url, ...(i.tags || []), ...(i.thread || []).map((p) => p.text)].join(' ').toLowerCase().includes(q)))
     .sort((a, b) => (b.added || '').localeCompare(a.added || ''));
   el.innerHTML = list.length
     ? `<div class="masonry dense">${list.slice(0, libLimit).map(tileCard).join('')}</div>${list.length > libLimit ? '<button type="button" class="btn block" data-act="more-lib">Show more</button>' : ''}`
@@ -786,12 +795,13 @@ function saveBulk() {
 function openItem(id) {
   const it = byId('items', id);
   if (!it) return;
-  const media = embedHtml(it);
+  const media = threadLen(it) ? '' : embedHtml(it);
   openSheet(`
     ${media ? `<div class="sheet-media">${media}</div>` : ''}
     <textarea class="plain title" data-field="title" rows="1" placeholder="${esc(itemTitle(it))}">${esc(it.title || '')}</textarea>
     <p class="src" style="margin-top:8px">${typeIcon(it)}<span>${esc(sourceLine(it))}</span> · <a href="${esc(safeHref(it.url))}" target="_blank" rel="noopener">Open original</a></p>
-    ${it.type === 'x' && it.text && !media.includes('twitter-tweet') ? `<p class="post-text">${esc(it.text)}</p>` : ''}
+    ${threadLen(it) ? `<span class="field-label">Thread · ${threadLen(it)} posts</span>${threadHtml(it)}`
+      : it.type === 'x' && it.text && !media.includes('twitter-tweet') ? `<p class="post-text">${esc(it.text)}</p>` : ''}
     <textarea class="plain note" data-field="note" rows="2" placeholder="Why is this worth your time? (optional)">${esc(it.note || '')}</textarea>
     <span class="field-label">Tags</span>
     ${tagChips(it.tags || [], 'item')}

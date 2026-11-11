@@ -49,14 +49,42 @@ async function firstJson(urls, key) {
 }
 const fill = (rec, key, val) => { if (val && !rec[key]) { rec[key] = String(val).slice(0, 2000); return true; } return false; };
 
+const cleanText = (s) => (s || '').replace(/\s*https:\/\/t\.co\/\w+\s*$/, '').trim();
+const firstImage = (p) => p.article?.cover_media?.media_info?.original_img_url || p.media?.photos?.[0]?.url
+  || p.media?.videos?.[0]?.thumbnail_url || p.media?.mosaic?.formats?.jpeg || '';
+// A thread = the saved post plus the author's own posts in the same conversation, oldest first.
+// Replies from other people are left out.
+function threadParts(focal, thread) {
+  const who = (focal.author?.screen_name || '').toLowerCase();
+  const mine = [focal, ...(thread || [])].filter((p) => p && p.id && (p.author?.screen_name || '').toLowerCase() === who);
+  const byId = new Map(mine.map((p) => [String(p.id), p]));
+  return [...byId.values()]
+    .sort((a, b) => (BigInt(a.id) < BigInt(b.id) ? -1 : 1))
+    .slice(0, 60)
+    .map((p) => ({ id: String(p.id), text: cleanText(p.raw_text?.text || p.text).slice(0, 4000), image: firstImage(p) }));
+}
 async function enrichX(it) {
   const id = statusId(it.url);
   if (!id) return false;
-  // Documented v2 endpoint first ({ status }), older v1 endpoint as a fallback ({ tweet }).
+  // Unrolled thread first ({ status, thread }), then the plain post endpoints as fallbacks.
   let t;
-  try { t = await firstJson([`${FX}/2/status/${id}`], 'status'); } catch (e) { t = await firstJson([`${FX}/status/${id}`], 'tweet'); }
+  let thread = null;
+  try {
+    const j = await get(`${FX}/2/thread/${id}`, true);
+    if (!j || !j.status) throw new Error(`no status (code ${j && j.code})`);
+    t = j.status; thread = j.thread;
+  } catch (e) {
+    try { t = await firstJson([`${FX}/2/status/${id}`], 'status'); } catch (e2) { t = await firstJson([`${FX}/status/${id}`], 'tweet'); }
+  }
   if (!t.author) return false;
   let ch = false;
+  const parts = threadParts(t, thread);
+  if (parts.length > 1) {
+    const before = JSON.stringify(it.thread || []);
+    it.thread = parts;
+    ch = ch || before !== JSON.stringify(parts);
+  }
+  it.threadChecked = now;
   const art = t.article;
   if (art && art.title) ch = fill(it, 'title', art.title) || ch;
   // An article post's own text is usually just a short link; its preview text reads better.
@@ -100,12 +128,14 @@ async function enrichPerson(c) {
 // A failed lookup is retried on the next runs; after 3 failures we stop trying.
 function giveUpOrRetry(rec) {
   rec.enrichTries = (rec.enrichTries || 0) + 1;
-  if (rec.enrichTries >= 3) rec.enriched = now;
+  if (rec.enrichTries >= 3) { rec.enriched = now; if (rec.type === 'x') rec.threadChecked = now; }
 }
 
 for (const it of db.items || []) {
   if (tried >= MAX) break;
-  if (it.deleted || it.enriched) continue;
+  // X posts saved before thread support get one extra check for the rest of their thread.
+  const needsThread = it.type === 'x' && !it.threadChecked;
+  if (it.deleted || (it.enriched && !needsThread)) continue;
   tried++;
   try {
     const ch = it.type === 'x' ? await enrichX(it)
