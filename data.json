@@ -160,11 +160,12 @@
       ],
       "status": "unread",
       "added": "2026-11-04T00:00:00.000Z",
-      "updated": "2026-11-05T03:23:25.000Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "万字长文，一文说清楚我是从程序员转型成为Ai讲师的",
       "author": "孔令涛",
       "image": "https://pbs.twimg.com/media/HWQWRIFboAAsoTi.jpg",
-      "enriched": "2026-11-05T03:14:03.568Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "design-1",
@@ -326,10 +327,11 @@
       ],
       "status": "reference",
       "added": "2026-11-04T15:00:00.000Z",
-      "updated": "2026-11-05T03:23:25.000Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "10 github repos that turn claude code and codex into elite ui designers:\n\n 1.⁠ ⁠Superdesign Skill\n    https://t.co/WcBesRprR8\n 2.⁠ ⁠Better Design\n    https://t.co/MY3r3DRGfI\n 3.⁠ ⁠Design Taste\n    https://t.co/hIEh7IbLhk\n 4.⁠ ⁠Canvas UI\n    https://t.co/XBn2ccH6cg\n 5.⁠ ⁠Paper Shaders\n    https://t.co/IvDIhx2omg\n 6.⁠ ⁠UI Layouts\n    https://t.co/VJl3MnXpHf\n 7.⁠ ⁠Hyperiux Components\n    https://t.co/Vr2nmb2MIp\n 8.⁠ ⁠Motion Primitives\n    https://t.co/cgSZr64XuZ\n 9.⁠ ⁠Cursify\n    https://t.co/nnu6qdKUlZ\n10.⁠ ⁠Trickle UI Kit",
       "author": "0xMarioNawfal",
-      "enriched": "2026-11-05T03:14:03.568Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mw2z7idlguwt2",
@@ -346,12 +348,25 @@
         "AI",
         "Learning"
       ],
-      "updated": "2026-11-05T06:53:24.686Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "This is now also on the Claude Blog.\n\nMarkdown has become the dominant file format used by agents to communicate with us. It’s simple, portable, has some rich text capability and is easy for you to",
       "author": "Thariq",
       "image": "https://pbs.twimg.com/media/HHz_ftzaIAAwkQs.jpg",
-      "enriched": "2026-11-05T06:53:08.510Z",
-      "readAt": "2026-11-05T06:53:24.686Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "readAt": "2026-11-05T06:53:24.686Z",
+      "thread": [
+        {
+          "id": "2052809885763747935",
+          "text": "",
+          "image": "https://pbs.twimg.com/media/HHz_ftzaIAAwkQs.jpg"
+        },
+        {
+          "id": "2056843158965858380",
+          "text": "Now also on the Claude Blog:",
+          "image": ""
+        }
+      ],
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mw3izsue4tpx6",
@@ -364,12 +379,13 @@
       "title": "How to fix your entire life in 1 day",
       "note": "",
       "tags": [],
-      "updated": "2026-11-05T13:23:20.389Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "If you're anything like me, you think new years resolutions are stupid.\nBecause most people go about changing their lives in the completely wrong way. They create these resolutions because everyone",
       "author": "DAN KOE",
       "image": "https://pbs.twimg.com/media/G-efypCbQAEEi8a.jpg",
-      "enriched": "2026-11-05T12:32:42.425Z",
-      "readAt": "2026-11-05T13:23:20.389Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "readAt": "2026-11-05T13:23:20.389Z",
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mw4euql4qpz3i",
@@ -382,12 +398,30 @@
       "title": "",
       "note": "",
       "tags": [],
-      "updated": "2026-11-06T03:30:12.325Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "So here it is — @ryolu_ 's talk at @aiDotEngineer  2026 Shanghai.\n\nI shot it handheld on a Xiaomi 15 Ultra, so there's some shake; I fixed as much of it as I could in CapCut. Handheld footage just isn't going to be sharp or steady.\n\nStill, it's the best talk I saw on day 1 of AIE — which is why I'm not posting a text summary. Watch for yourself.\n\nI missed the first minute or so. Ryo opens with the excitement of what AI makes possible, and how seeing what others are building can quickly turn that excitement into anxiety about falling behind.",
       "author": "ZinkLu",
       "image": "https://pbs.twimg.com/amplify_video_thumb/2118352504065060864/img/WqnFbRnZ3tWtOTKg.jpg",
-      "enriched": "2026-11-06T03:24:29.518Z",
-      "readAt": "2026-11-06T03:30:12.325Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "readAt": "2026-11-06T03:30:12.325Z",
+      "thread": [
+        {
+          "id": "2118357855782965560",
+          "text": "So here it is — @ryolu_ 's talk at @aiDotEngineer  2026 Shanghai.\n\nI shot it handheld on a Xiaomi 15 Ultra, so there's some shake; I fixed as much of it as I could in CapCut. Handheld footage just isn't going to be sharp or steady.\n\nStill, it's the best talk I saw on day 1 of AIE — which is why I'm not posting a text summary. Watch for yourself.\n\nI missed the first minute or so. Ryo opens with the excitement of what AI makes possible, and how seeing what others are building can quickly turn that excitement into anxiety about falling behind.",
+          "image": "https://pbs.twimg.com/amplify_video_thumb/2118352504065060864/img/WqnFbRnZ3tWtOTKg.jpg"
+        },
+        {
+          "id": "2118359090930085948",
+          "text": "@ryolu_ @aiDotEngineer 哦，当然还有一些演讲也非常精彩，比如：\n\n@ManusAI 分享的 monorepo 这也是为什么我鼓励我们产品经理也去提 PR 的原因。\n\n@lifesinger 分享优慢的是悦己的，向内的，让我印象深刻。\n\n@WaytoAGI AJ 和 @Saccc_c 他们的分享在我看来简直是变魔术，真的要向他们好好学习。",
+          "image": ""
+        },
+        {
+          "id": "2118375829705220318",
+          "text": "@ryolu_ @aiDotEngineer @ManusAI @lifesinger @WaytoAGI @Saccc_c 抓个 asr 的问题，优慢的=youmind 哈 @YouMind_AI …(⊙_⊙;)",
+          "image": ""
+        }
+      ],
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mw6iztvh2eb3p",
@@ -403,11 +437,12 @@
         "Design",
         "AI"
       ],
-      "updated": "2026-11-07T14:55:56.949Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "经常有小伙伴问我，怎么用 AI 做出好看的产品设计，不那么 AI Slop，其实不是很好答，因为自己也不是专业的，只能站在产品工程师视角来给大伙聊一聊，怎么做出不丑且易用的产品。\n\n首先要知道一个前提，很多时候好看的设计也救不了不解决问题的产品，设计在这里只是锦上添花的作用，而非决定产品的成败，假如要我选择产品优先级，应该是能解决问题 > 易于使用 > 好看美观，好比先解决不饿着、再解决温饱、最好解决吃好一样。\n\n能解决问题这里不多说，更多取决于产品本身，它是去解决一个具体的需求，有人需要，有场景需要，刚好你这个产品可以提供一个解决方案让人或者 Agent 使用完成目标就好了，只不过解决问题有大有小。\n\n那么如何做易用且不丑的产品呢？哈哈，可以照着走一遍，也可以把下面的这一大段给你的 Agent 让他去帮你 Review 一下你的产品代码仓库。\n\n1. 把自己当做一个普通不懂技术的小白，他拿到我们产品，能否把主链路走完产出他所需要的东西，哪些地方有卡点，哪些地方没有讲明白，哪些地方的衔接不通顺，全部去修复，让用户不用说明书也可以完成产品的使用，假如实在不能，可以适当补充提示说明。\n\n2. 所有文案需要符合对应语言当地人的使用习惯，需要仔细斟酌词藻，不要干巴巴的翻译，可以从 Apple、Windows 系统以及知名网站去找同类词的最好翻译和解释，文案做到尽可能让本地人感觉非常简单、易懂、清晰。\n\n3. 产品上能用产品本身表达清楚的地方就不要再加文案说明，不要啰嗦的解释一个东西，仔细思考每一个说明文案是否达意且不啰嗦，交互视觉可以说清楚的地方就不要用文案再表达一遍。\n\n4. 在数字的表达上需要让用户明白这个数据指的内容，以及考虑到数据表达意思后的易读，比如钱、指标、距离各种单位需要考虑到本身的最佳实践，数据的准确性非常重要，不要为了偷懒少了数据的校验。\n\n5. 对于用户确定的操作不需要反复找用户确定，只有在会产生不可逆影响的时候二次找用户确定是否需要执行，防止满屏都是各种弹框确定，对于危险的操作不要出现大片的红，需要考虑用户操作一个产品的愉悦度，用户不是傻子不要过度担心会犯错。\n\n6. 视觉上，一个页面只留一个强调色，尽量不要使用橙色、陶土色和后台常见的那种老企业亮蓝色，灰色全部用偏暖的灰，不使用冷冰冰的蓝灰，找不到合适的颜色可以去中国传统颜色里面去找到合适的。\n\n7. 字号类型尽可能少一点，一个页面最多控制4种不同的字号，需要考虑到页面整体的阅读节奏感，清晰感以及文字的对比度，确保符合无障碍，包括考虑到行间间、字间距、段落间距需要反复调整，同时保持整体的规范一致。\n\n8. 少用斜体、等宽字体、全大写，要用的场景必须要有详细的理由说明，说明文案不要使用斜体，等宽字体只用于代码、路径、指标，按钮和标签里面的字不要大写，少用中间点 · 来连接内容。同一个动作在整个产品里面只用一个动词，此外动词的考虑尽量不要催促用户去执行，比如少用立即购买这种营销词。\n\n9. 页面的按钮、间距、圆角、分割线、弹窗、动画、阴影这类设计规范保持一致，同时保持克制，不打扰用户，嵌套的圆角要同心，里面的圆角等于外面的圆角减去间距会更好看。页面默认是平的，不叠阴影、不发光、不加毛玻璃，阴影只给真正浮起来的弹窗，不要卡片套卡片。\n\n10. 在多语言的环境下，优先考虑最长文案的排布，优先考虑达意而非为了好看而改变原意，可以改文案，但不要变字号和截断。需要特别考虑在不同尺寸下的展示效果是否都良好，考虑到用户常用的设备，全部去测试，遇到不好的地方全部修复。\n\n11. 对于反复调整不好的设计，或者做了好多轮都感觉不好看的设计，让 Agent 帮你出3个他认为最好的方案来让你挑选，然后你选择一个更好的，告诉他去优化，直到改到你满意，我比较喜欢让 AI 生成对比前后的图片放到一个pdf里面，这样我的阅读对比体验会更好。\n\n大概就是上面这些，不过还有一个非常重要的就是你自己的耐心和反复调整，我比较强迫症，经常会因为了一个文案、一个颜色、一个设计和 AI 讨论十几轮，直到自己满意了才舒服，虽然 AI 很聪明，但是很多时候你对他的要求要更多，以及你需要付出更多的时间和耐心，才可以做出满意的效果，或者说你多花时间，多去看好的设计，其实就可以做出易用不丑的产品了。",
       "author": "Tw93",
       "image": "https://pbs.twimg.com/media/HWbcwJMbUAAgvBX.jpg?name=orig",
-      "enriched": "2026-11-07T14:55:56.949Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mw7cap7ekaz01",
@@ -422,11 +457,24 @@
       "tags": [
         "AI"
       ],
-      "updated": "2026-11-08T04:36:16.465Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "... as of October 2026.\nUse the latest and greatest models. Everything else is potentially a waste of time. If a model is wrong 10% of the time, you don't know which 10%, so you end up making multiple",
       "author": "Thorsten Ball",
       "image": "https://pbs.twimg.com/media/HVfOvcmXkAAhUhz.jpg",
-      "enriched": "2026-11-08T04:36:16.465Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "thread": [
+        {
+          "id": "2114386050638336082",
+          "text": "Finally summarized what I've been sending to friends in DMs",
+          "image": "https://pbs.twimg.com/media/HVfOvcmXkAAhUhz.jpg"
+        },
+        {
+          "id": "2115081140994457711",
+          "text": "There's also a longer, more in-depth version of this here:",
+          "image": ""
+        }
+      ],
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mw7ezqjoslqbc",
@@ -488,10 +536,11 @@
       "title": "",
       "note": "",
       "tags": [],
-      "updated": "2026-11-09T06:38:01.724Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "If you want to get out of your current life situation, you shouldn’t be worried about how long it will take to change it. You have nothing better to do than to work on something meaningful. Who cares if it takes 12 months or 12 years when it's going to be difficult either way.",
       "author": "DAN KOE",
-      "enriched": "2026-11-09T06:38:01.724Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mw974z85e36hc",
@@ -506,11 +555,24 @@
       "tags": [
         "AI"
       ],
-      "updated": "2026-11-09T11:47:22.810Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "when we can do anything,\ndo we still know what we want?\n\nthe full talk from @aiDotEngineer shanghai. every slide handmade in keynote, subs in 中文 and english",
       "author": "Ryo Lu",
       "image": "https://pbs.twimg.com/amplify_video_thumb/2119584955290595328/img/eb5xqZCfcuAPgNL7.jpg",
-      "enriched": "2026-11-09T11:47:22.810Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "thread": [
+        {
+          "id": "2119586846657454152",
+          "text": "when we can do anything,\ndo we still know what we want?\n\nthe full talk from @aiDotEngineer shanghai. every slide handmade in keynote, subs in 中文 and english",
+          "image": "https://pbs.twimg.com/amplify_video_thumb/2119584955290595328/img/eb5xqZCfcuAPgNL7.jpg"
+        },
+        {
+          "id": "2120090087715426614",
+          "text": "read or watch on my journal – in english, chinese or japanese",
+          "image": ""
+        }
+      ],
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mwa30mqfbhm0t",
@@ -525,10 +587,11 @@
       "tags": [
         "AI"
       ],
-      "updated": "2026-11-10T02:39:48.435Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "I really love using Fable 5.2. On big, open-ended work it feels like a major step above Opus 5.5. \n\nA few tips for getting the most out of it:\n- Ask what’s wrong with your idea before it builds anything. It’s great at brainstorming and will push back\n- Start on med/high effort, and save xhigh for hardest problems\n- Tell it up front what needs your approval (e.g. deleting things) and that the rest is its call\n- Give it a whole project instead of a next step and let it run for hours. This is where it shines",
       "author": "Alex Albert",
-      "enriched": "2026-11-10T02:39:48.435Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mwacr2sbeeg8b",
@@ -543,11 +606,24 @@
       "tags": [
         "AI"
       ],
-      "updated": "2026-11-10T07:12:17.418Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "与神对话，神给的人生建议    - -Fable5.2\n\n1.每周运动三次，每年体检一次，睡眠优先于娱乐。\n2.存够一年的生活费作为应急金。\n3.不借钱消费，不投自己看不懂的东西。\n4.选一项技能深耕五年，做到别人愿意为它付钱。\n5.把AI用进日常工作，每半年更新一次用法。\n6.把时间留给三五个真正重要的人，远离消耗你的人。\n7.多陪父母，趁他们还健康。\n8.每年读十本好书，少刷短视频。\n9.每年做一件让自己有点害怕的事。\n10.每年年底写一页复盘，定下来年最重要的三件事。",
       "author": "Levi 卧云",
       "image": "https://pbs.twimg.com/media/HWuy7T5bEAAC23Y.jpg?name=orig",
-      "enriched": "2026-11-10T07:12:17.418Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "thread": [
+        {
+          "id": "2119986401588416986",
+          "text": "与神对话，神给的人生建议    - -Fable5.2\n\n1.每周运动三次，每年体检一次，睡眠优先于娱乐。\n2.存够一年的生活费作为应急金。\n3.不借钱消费，不投自己看不懂的东西。\n4.选一项技能深耕五年，做到别人愿意为它付钱。\n5.把AI用进日常工作，每半年更新一次用法。\n6.把时间留给三五个真正重要的人，远离消耗你的人。\n7.多陪父母，趁他们还健康。\n8.每年读十本好书，少刷短视频。\n9.每年做一件让自己有点害怕的事。\n10.每年年底写一页复盘，定下来年最重要的三件事。",
+          "image": "https://pbs.twimg.com/media/HWuy7T5bEAAC23Y.jpg?name=orig"
+        },
+        {
+          "id": "2120013679534252156",
+          "text": "动态签名 skill 已更新～",
+          "image": ""
+        }
+      ],
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mwakee1peipns",
@@ -562,10 +638,11 @@
       "tags": [
         "AI"
       ],
-      "updated": "2026-11-10T10:46:28.166Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "建议大家都去油管学 AI Agent，真的能打破信息差！\n\n① Jeff Su 节奏快、实用导向，适合普通人入门。他有大量把 Prompt、AI Agent、工具落地讲清楚的短视频（例如约 10 分钟的 AI Agents, Clearly Explained 播放量很高）。\n\n内容直给，新手跟着做能上手。频道约 190 万订阅，风格轻松实用。\n\n② Andrej Karpathy AI 领域真正的大神（前 Tesla AI、OpenAI 等）。他的 LLM 入门/深度讲解视频（1 小时版和更长的 Deep Dive）在圈内刷屏，原理、训练、应用讲得通俗，非技术背景也能跟上。干货密度极高。\n\n③ Tina Huang 前 Meta 数据工程师/科学家。录有《Building AI Agents In 44 Minutes》《AI Agents Fundamentals In 21 Minutes》等视频，擅长把复杂资料提炼成清晰框架和实操路径，非常适合作为入门第一课。频道约 140 万订阅。\n\n④ Dave Ebbelaar（Datalumina） Datalumina 创始人，内容聚焦可落地的 AI 系统工程（生产级 Agent、架构、部署）和 AI 自由职业/创业建议。\n\n实战导向，经验分享多，适合想真正做出系统的人。\n\n⑤ IBM Technology IBM 官方频道，覆盖 AI、自动化、DevOps、量子等，常有领域专家讲解。内容广度好，解释相对严谨可靠，像一个小型 AI 知识库。适合建立系统性认知。\n\n⑥ Google Cloud Tech Google Cloud 官方频道，更垂直深入（Vertex AI、Agent 相关、NotebookLM、实用工具等）。\n\n如果说 IBM 更“广”，这个更“深”，尤其适合想用 Google 生态落地的人。\n\n⑦ Cole Medin 强烈推荐做 Agent 实操。重点讲生产级 AI Agent、n8n / LangGraph 全流程构建、本地部署、架构设计。\n\n内容实战、有完整项目和仓库，适合从“会用”进阶到“能做出稳定系统”。在很多“学 Agent 必看”列表里常出现。\n\n⑧ Liam Ottley 偏商业落地和变现角度。有超长完整指南（如《How to Build & Sell AI Agents》），覆盖无代码/低代码构建、自动化业务、接单卖服务。\n\n适合想把 AI Agent 技能直接变成收入的人。\n\n⑨ Andrew Ng / DeepLearningAI Andrew Ng 是 AI 教育与实践的标杆人物。DeepLearningAI 频道有关于 Agentic AI、设计模式（reflection、tool use、planning、multi-agent）的短课程和讲解，质量高、结构清晰。\n\n适合想建立扎实基础并理解“为什么这样设计”的人。\n\n⑩ Nate Herk 以 n8n + AI Agent 实操闻名，有完整的无代码/低代码 Agent 教程和长视频课程。\n\n非常适合不想先写大量代码、又想快速做出能用的自动化 Agent 的人。\n\n和 Cole Medin、Liam Ottley 互补。\n\n学习建议（快速上手路径）\n\n1.完全新手：Jeff Su + Tina Huang 先建立概念 → 再看 Karpathy 补原理。\n2.想动手做：Tina Huang / Cole Medin / Nate Herk 跟做项目。\n3.想做生意/自由职业：Liam Ottley + Dave Ebbelaar。\n3.想系统扎实：Karpathy + Andrew Ng + IBM / Google Cloud 官方内容。\n\n这些频道大多免费、更新相对及时，能有效打破信息差。\n\n建议先看 1-2 个入门视频确认风格是否适合自己，再深入。\n\n如果有具体方向（比如纯无代码、Python 工程、商业变现），可以再细化推荐。",
       "author": "动物园园长",
-      "enriched": "2026-11-10T10:46:28.166Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     },
     {
       "id": "mwar77a3f5jel",
@@ -598,10 +675,23 @@
         "Business",
         "AI"
       ],
-      "updated": "2026-11-11T05:51:50.870Z",
+      "updated": "2026-11-11T08:42:48.843Z",
       "text": "Someone asked what I'd do if I were 17. I'd learn how to build LLMs from scratch, and then train ones as powerful as I could with whatever hardware I could get access to.",
       "author": "Paul Graham",
-      "enriched": "2026-11-11T05:51:50.870Z"
+      "enriched": "2026-11-11T08:42:48.843Z",
+      "thread": [
+        {
+          "id": "2091544343589060625",
+          "text": "Someone asked what I'd do if I were 17. I'd learn how to build LLMs from scratch, and then train ones as powerful as I could with whatever hardware I could get access to.",
+          "image": ""
+        },
+        {
+          "id": "2091545800736403473",
+          "text": "Notice that what I would not do is try to start a startup. Instead I'd build the foundation of knowledge to base a startup on later. Way better startup ideas would grow out of understanding LLMs deeply than trying to start companies based on what I knew at 17.",
+          "image": ""
+        }
+      ],
+      "threadChecked": "2026-11-11T08:42:48.843Z"
     }
   ],
   "ideas": [
