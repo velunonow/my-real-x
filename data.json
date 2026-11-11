@@ -701,12 +701,16 @@
       "type": "web",
       "handle": "",
       "videoId": "",
-      "title": "",
+      "title": "Emil Kowalski",
       "note": "",
       "tags": [
         "Design"
       ],
-      "updated": "2026-11-11T15:20:29.358Z"
+      "updated": "2026-11-11T15:20:39.080Z",
+      "site": "Emil Kowalski",
+      "desc": "A skill file based on the articles written on Emil Kowalski’s personal site.",
+      "image": "https://emilkowal.ski/skill/opengraph-image.jpg?3b7d4ffbba2ea01d",
+      "enriched": "2026-11-11T15:20:39.080Z"
     }
   ],
   "ideas": [
