@@ -703,8 +703,10 @@
       "videoId": "",
       "title": "",
       "note": "",
-      "tags": [],
-      "updated": "2026-11-11T15:20:27.125Z"
+      "tags": [
+        "Design"
+      ],
+      "updated": "2026-11-11T15:20:29.358Z"
     }
   ],
   "ideas": [
