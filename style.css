@@ -148,7 +148,7 @@ button.rowcard { width: 100%; border: 0; text-align: left; font: inherit; color:
 .mini-card { flex: 0 0 140px; margin: 0 !important; }
 .mini-card img, .mini-card .ph-s { width: 100%; height: 76px; object-fit: cover; }
 .mini-card .ph-s { display: grid; place-items: center; background: var(--forest-soft); color: var(--forest); }
-.mini-card p { margin: 9px 11px 11px; padding: 0; font-family: var(--serif); font-size: 15px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.mini-card p { margin: 9px 11px 11px; padding: 0; font-family: var(--serif); font-size: 15px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* ---------- Collection: dense wall ---------- */
 /* Wider page and smaller, tighter cards so many saves fit on one screen:
@@ -188,6 +188,14 @@ body[data-view="library"] .mini-card p { font-size: 13.5px; margin: 7px 9px 9px;
 .dense .src { font-size: 12px; gap: 4px; }
 .dense .src svg.i { width: 13px; height: 13px; }
 .dense .made { margin-top: 4px; font-size: 11.5px; }
+
+/* threads: read the whole thread in the app */
+.thread { display: grid; gap: 10px; margin: 4px 0 6px; }
+.thread-part { background: var(--card); border-radius: 18px; padding: 14px 16px 16px; box-shadow: 0 1px 2px rgba(18, 40, 26, .05); }
+.thread-part .post-text { margin: 4px 0 0; display: block; -webkit-line-clamp: unset; overflow: visible; }
+.thread-n { font-size: 12px; font-weight: 650; color: var(--faint); font-variant-numeric: tabular-nums; }
+.thread-img { width: 100%; border-radius: 12px; margin-top: 10px; max-height: 420px; object-fit: cover; }
+.thread-flag { margin-top: 6px; }
 
 /* rows */
 .rowcard { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
