@@ -738,15 +738,12 @@
       "type": "web",
       "handle": "",
       "videoId": "",
-      "title": "dissolve · turn any React Native view into dust",
-      "note": "",
+      "title": "",
+      "note": "animation library for agent",
       "tags": [
         "Design"
       ],
-      "updated": "2026-11-19T08:05:43.925Z",
-      "desc": "react-native-dissolve snapshots any view and turns it into dust. Sixteen variants, Skia Atlas, UI thread.",
-      "image": "https://dissolve.rselmi.com/",
-      "enriched": "2026-11-19T08:05:43.925Z"
+      "updated": "2026-11-19T08:05:56.392Z"
     }
   ],
   "ideas": [
