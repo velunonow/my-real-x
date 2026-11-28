@@ -775,12 +775,15 @@
       "type": "web",
       "handle": "",
       "videoId": "",
-      "title": "",
+      "title": "UI style guides",
       "note": "",
       "tags": [
         "Design"
       ],
-      "updated": "2026-11-28T02:08:00.560Z"
+      "updated": "2026-11-28T02:08:15.345Z",
+      "desc": "A library of every single UI style guide and guideline document",
+      "image": "https://aresluna.org/images/ui-style-guides/ogimage.png",
+      "enriched": "2026-11-28T02:08:15.345Z"
     }
   ],
   "ideas": [
